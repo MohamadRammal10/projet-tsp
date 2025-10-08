@@ -4,7 +4,7 @@
 int main(int argc, char *argv[]) {
     //temp
     if (argc != 2){
-        printf("Usage: %s <tsp_file>\n", argv[0]);    
+        printf("Usage: %s tests/<tsp_file>\n", argv[0]);    
         return -1;
     }
     
