@@ -8,25 +8,28 @@ from pathlib import Path
 # Usage : python3 tests/test_tsplib95.py (in the root directory)
 
 # ========= CONFIG =========
-TSP_FILE = "tests/bier127.tsp"
-EXECUTABLE = "./tsp"
+TESTS_DIR = Path("tests")
+EXECUTABLE = Path("./tsp").resolve()
 # ==========================
 
 def run_c_prog(tsp_file):
     """Runs the compiled C executable and returns its stdout."""
 
-    cmd = [EXECUTABLE, tsp_file]
+    cmd = [str(EXECUTABLE), str(tsp_file)]
     try:
         result = subprocess.run(cmd, capture_output=True, text=True, check=True)
         return result.stdout
     except subprocess.CalledProcessError as e:
-        print(f"Error running C program: {e}", file=sys.stderr)
         print(f"stderr: {e.stderr}", file=sys.stderr)
-        sys.exit(1)
+        return None
 
 def parse_c_output(output):
     """Extracts info from C debug output using regex."""
     info = {}
+
+    if output is None:
+        return info
+    
     name_match = re.search(r"Name\s*:\s*(\S+)", output)
     dim_match = re.search(r"Dimension\s*:\s*(\d+)", output)
     edge_match = re.search(r"Edge weight type\s*:\s*(\S+)", output)
@@ -38,7 +41,6 @@ def parse_c_output(output):
     if edge_match:
         info["edge_weight_type"] = edge_match.group(1)
 
-    # optional: extract a few distances if printed
     dist_matches = re.findall(r"\[DEBUG\] Read coords: (\d+) ->", output)
     info["coords_count"] = len(dist_matches)
 
@@ -52,44 +54,63 @@ def compare_with_tsplib95(problem, c_info):
     results.append(("Dimension", c_info.get("dimension"), problem.dimension))
     results.append(("Edge Weight Type", c_info.get("edge_weight_type"), problem.edge_weight_type))
 
-    # Distance consistency check (C = Euclidean integer-rounded)
+    # Distance consistency check
     ref12 = problem.get_weight(1, 2)
     ref23 = problem.get_weight(2, 3)
 
     results.append(("Distance(1,2)", None, ref12))
     results.append(("Distance(2,3)", None, ref23))
 
-    print("\n===== AUTOMATED TEST REPORT =====")
     passed = True
     for label, c_val, py_val in results:
-        if c_val is None:  # skip missing from C
-            print(f"{label:<25}: Python={py_val}")
-            continue
-
-        status = "✅ PASS" if str(c_val) == str(py_val) else "❌ FAIL"
-        print(f"{label:<25}: C={c_val} | Python={py_val} --> {status}")
-        if status == "❌ FAIL":
+        if c_val is not None and str(c_val) != str(py_val):  # skip missing from C
             passed = False
+    return passed, results
 
-    print(f"\nTotal: {'✅ ALL TESTS PASSED' if passed else '❌ SOME TESTS FAILED'}")
-    return passed
-
-
-def main():
-    if not Path(EXECUTABLE).exists():
-        print(f"[ERROR] Executable {EXECUTABLE} not found. Compile your C program first (make).")
+def test_all_files():
+    """Run tests on all TSP files in the tests directory."""
+    if not EXECUTABLE.exists():
+        print(f"[ERROR] Executable {EXECUTABLE} NOT found.")
         sys.exit(1)
-    if not Path(TSP_FILE).exists():
-        print(f"[ERROR] File {TSP_FILE} not found.")
-        sys.exit(1)
+    
+    tsp_files = sorted(TESTS_DIR.glob("*.tsp"))
+    if not tsp_files:
+        print(f"[ERROR] No .tsp files found in {TESTS_DIR}")
+        sys.exit(2)
 
-    print(f"Running C program on {TSP_FILE}...\n")
-    c_output = run_c_prog(TSP_FILE)
-    c_info = parse_c_output(c_output)
+    print(f"Found {len(tsp_files)} TSP files\n")
 
-    problem = tsplib95.load(TSP_FILE)
-    compare_with_tsplib95(problem, c_info)
+    overall_pass = True
+    for tsp_file in tsp_files:
+        print(f"--- Testing {tsp_file.name} ---")
+        c_output = run_c_prog(tsp_file)
+        if c_output is None:
+            overall_pass = False
+            print(f"[ERROR] Failed to get output from C program for {tsp_file.name}\n")
+            continue
+        c_info = parse_c_output(c_output)
+        problem = tsplib95.load(tsp_file)
+        passed, results = compare_with_tsplib95(problem, c_info)
+
+        status = "✅ PASS" if passed else "❌ FAIL"
+        print(f"Result: {status}")
+
+        for label, c_val, py_val in results:
+            if c_val is None:
+                print(f"{label:<25}: Python={py_val}")
+            else:
+                print(f"{label:<25}: C={c_val} | Python={py_val}")
+        print("-" * 40)
+
+        if not passed:
+            overall_pass = False
+    
+    print("\n===== OVERALL TESTS RESULTS =====")
+    if overall_pass:
+        print("✅ ALL TESTS PASSED")
+    else:
+        print("❌ SOME TESTS FAILED")
 
 
 if __name__ == "__main__":
-    main()
+    test_all_files()
