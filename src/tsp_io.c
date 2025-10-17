@@ -18,23 +18,23 @@ int read_tsplib(const char *filename, TSPInstance *instance) {
     char line[256];
     while(fgets(line, sizeof(line), file)) {
         if (sscanf(line, "NAME : %s", instance->name) == 1) {
-            printf("[DEBUG] Name : %s\n", instance->name);
+            printf("[INFO] Name : %s\n", instance->name);
         }
 
         else if (sscanf(line, "COMMENT : %[^\n]", instance->comment) == 1) {
-            printf("[DEBUG] Comment : %s\n", instance->comment);
+            printf("[INFO] Comment : %s\n", instance->comment);
         }
 
         else if (sscanf(line, "TYPE : %s", instance->type) == 1) {
-            printf("[DEBUG] Type : %s\n", instance->type);
+            printf("[INFO] Type : %s\n", instance->type);
         }        
         
         else if (sscanf(line, "DIMENSION : %d", &instance->dimension) == 1) {
-            printf("[DEBUG] Dimension : %d\n", instance->dimension);
+            printf("[INFO] Dimension : %d\n", instance->dimension);
         }
 
         else if (sscanf(line, "EDGE_WEIGHT_TYPE : %s", instance->edge_weight_type) == 1) {
-            printf("[DEBUG] Edge weight type : %s\n", instance->edge_weight_type);
+            printf("[INFO] Edge weight type : %s\n", instance->edge_weight_type);
         }
 
         else if (strncmp(line, "NODE_COORD_SECTION", 18) == 0) {
@@ -97,38 +97,9 @@ int build_distance_matrix(TSPInstance *instance, int mode){
         if (!instance->distances[i]) return -1;
     }
 
-    if (mode == 2) {  // GEO type
-            double *lat = malloc(n * sizeof(double));
-            double *lon = malloc(n * sizeof(double));
-            if (!lat || !lon) return -1;
-
-            for (int i = 0; i < n; i++) {
-                lat[i] = to_radians(instance->coords[i][0]);
-                lon[i] = to_radians(instance->coords[i][1]);
-            }
-
-            const double RRR = 6378.388;
-
-            for (int i = 0; i < n; i++) {
-                for (int j = 0; j < n; j++) {
-                    if (i == j)
-                        instance->distances[i][j] = 0.0;
-                    else {
-                        double q1 = cos(lon[i] - lon[j]);
-                        double q2 = cos(lat[i] - lat[j]);
-                        double q3 = cos(lat[i] + lat[j]);
-                        instance->distances[i][j] = (int)(
-                            RRR * acos(0.5 * ((1.0 + q1) * q2 - (1.0 - q1) * q3)) + 1.0
-                        );
-                    }
-                }
-            }
-
-            free(lat);
-            free(lon);
-            printf("[DEBUG] GEO distance matrix built (%d x %d)\n", n, n);
-            return 0;
-        }
+    if (mode == 2) { // GEO type
+        return geo_distance(instance);
+    }
 
     for (int i = 0; i < n; i++) {
         for (int j = 0; j < n; j++) {
@@ -151,7 +122,41 @@ int build_distance_matrix(TSPInstance *instance, int mode){
             }            
         }
     }
-    printf("[DEBUG] Distance matrix built (%d x %d)\n", n, n);
+    printf("[INFO] Distance matrix built (%d x %d)\n", n, n);
+    return 0;
+}
+
+int geo_distance(TSPInstance *instance){
+    int n = instance->dimension;
+    double *lat = malloc(n * sizeof(double));
+    double *lon = malloc(n * sizeof(double));
+
+    if (!lat || !lon) return -1;
+
+    for (int i = 0; i < n; i++) {
+        lat[i] = to_radians(instance->coords[i][0]);
+        lon[i] = to_radians(instance->coords[i][1]);
+    }
+
+    const double RRR = 6378.388;
+
+    for (int i = 0; i < n; i++) {
+        for (int j = 0; j < n; j++) {
+            if (i == j)
+                instance->distances[i][j] = 0.0;
+            else {
+                double q1 = cos(lon[i] - lon[j]);
+                double q2 = cos(lat[i] - lat[j]);
+                double q3 = cos(lat[i] + lat[j]);
+                instance->distances[i][j] = (int)(
+                    RRR * acos(0.5 * ((1.0 + q1) * q2 - (1.0 - q1) * q3)) + 1.0
+                );
+            }
+        }
+    }
+    free(lat);
+    free(lon);
+    printf("[DEBUG] GEO distance matrix built (%d x %d)\n", n, n);
     return 0;
 }
 

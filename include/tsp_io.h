@@ -18,5 +18,6 @@ int read_tsplib(const char *filename, TSPInstance *instance);
 int read_node_coords(FILE *file, TSPInstance *instance);
 int build_distance_matrix(TSPInstance *instance, int mode);
 double to_radians(double coord);
+int geo_distance(TSPInstance *instance);
 
 #endif
