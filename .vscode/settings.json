@@ -1,0 +1,7 @@
+{
+    "files.associations": {
+        "*.db": "sql",
+        "stdlib.h": "c",
+        "stdio.h": "c"
+    }
+}
