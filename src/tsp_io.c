@@ -2,7 +2,10 @@
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
+
 #include "../include/tsp_io.h"
+#include "../include/distance.h"
+#include "../include/distance_matrix.h"
 
 #ifndef M_PI
 #define M_PI 3.14159265358979323846
@@ -47,15 +50,23 @@ int read_tsplib(const char *filename, TSPInstance *instance) {
     }
 
     fclose(file);
+    
+    DistanceFunc dist_func = NULL;
 
     if (strcmp(instance->edge_weight_type, "EUC_2D") == 0) {
-        build_distance_matrix(instance, 0);
+        dist_func = distance_euc_2d;
     } else if (strcmp(instance->edge_weight_type, "ATT") == 0) {
-        build_distance_matrix(instance, 1);
+        dist_func = distance_att;
     } else if (strcmp(instance->edge_weight_type, "GEO") == 0)  {
-        build_distance_matrix(instance, 2);
+        dist_func = distance_geo;
     } else {
         fprintf(stderr, "Unsupported EDGE_WEIGHT_TYPE: %s\n", instance->edge_weight_type);
+        return -1;
+    }
+
+    instance->half_matrix = build_half_distance_matrix(instance->coords, instance->dimension, dist_func);
+    if (!instance->half_matrix) {
+        fprintf(stderr, "Error building half distance matrix\n");
         return -1;
     }
 
@@ -86,9 +97,9 @@ int read_node_coords(FILE *file, TSPInstance *instance){
     return 0;
 }
 
-/* Mode 0 : EUC_2D ; Mode 1 : ATT ; Mode 2 : GEO*/
-int build_distance_matrix(TSPInstance *instance, int mode){
+int build_distance_matrix(TSPInstance *instance,  DistanceFunc dist_func){
     int n = instance->dimension;
+
     instance->distances = malloc(n * sizeof(double *));
     if (!instance->distances) return -1;
 
@@ -97,71 +108,20 @@ int build_distance_matrix(TSPInstance *instance, int mode){
         if (!instance->distances[i]) return -1;
     }
 
-    if (mode == 2) { // GEO type
-        return geo_distance(instance);
-    }
-
     for (int i = 0; i < n; i++) {
         for (int j = 0; j < n; j++) {
             if (i == j){
                 instance->distances[i][j] = 0.0;
-                continue;
-            }
-            
-            double dx = instance->coords[i][0] - instance->coords[j][0];
-            double dy = instance->coords[i][1] - instance->coords[j][1];
-
-            if (mode == 1) { // ATT
-                double rij = sqrt((dx * dx + dy * dy) / 10.0);
-                int tij = (int)(rij + 0.5);
-                instance->distances[i][j] = (tij < rij) ? tij + 1 : tij;
-            }
-
-            else if (mode == 0) { // EUC_2D
-                instance->distances[i][j] = (int)(sqrt(dx * dx + dy * dy) + 0.5);
-            }            
+                
+            } else {
+                instance->distances[i][j] = dist_func(
+                    instance->coords[i][0], instance->coords[i][1],
+                    instance->coords[j][0], instance->coords[j][1]
+                );
+            }        
         }
     }
     printf("[INFO] Distance matrix built (%d x %d)\n", n, n);
     return 0;
 }
 
-int geo_distance(TSPInstance *instance){
-    int n = instance->dimension;
-    double *lat = malloc(n * sizeof(double));
-    double *lon = malloc(n * sizeof(double));
-
-    if (!lat || !lon) return -1;
-
-    for (int i = 0; i < n; i++) {
-        lat[i] = to_radians(instance->coords[i][0]);
-        lon[i] = to_radians(instance->coords[i][1]);
-    }
-
-    const double RRR = 6378.388;
-
-    for (int i = 0; i < n; i++) {
-        for (int j = 0; j < n; j++) {
-            if (i == j)
-                instance->distances[i][j] = 0.0;
-            else {
-                double q1 = cos(lon[i] - lon[j]);
-                double q2 = cos(lat[i] - lat[j]);
-                double q3 = cos(lat[i] + lat[j]);
-                instance->distances[i][j] = (int)(
-                    RRR * acos(0.5 * ((1.0 + q1) * q2 - (1.0 - q1) * q3)) + 1.0
-                );
-            }
-        }
-    }
-    free(lat);
-    free(lon);
-    printf("[DEBUG] GEO distance matrix built (%d x %d)\n", n, n);
-    return 0;
-}
-
-double to_radians(double coord) {
-    int deg = (int)coord;
-    double min = coord - deg;
-    return M_PI * (deg + 5.0 * min / 3.0) / 180.0;
-}

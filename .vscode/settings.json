@@ -2,6 +2,7 @@
     "files.associations": {
         "*.db": "sql",
         "stdlib.h": "c",
-        "stdio.h": "c"
+        "stdio.h": "c",
+        "string.h": "c"
     }
 }
