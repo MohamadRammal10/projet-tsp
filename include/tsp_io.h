@@ -1,6 +1,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include "../include/distance.h"
+#include "../include/distance_matrix.h"
+
+
+
 #ifndef TSP_IO_H
 #define TSP_IO_H
 
@@ -12,12 +17,13 @@ typedef struct {
     char edge_weight_type[20]; /* Supports only "EUC_2D" , "GEO", "ATT" */
     double **coords;
     double **distances;
+    HalfMatrix *half_matrix;
 } TSPInstance;
 
 int read_tsplib(const char *filename, TSPInstance *instance);
 int read_node_coords(FILE *file, TSPInstance *instance);
-int build_distance_matrix(TSPInstance *instance, int mode);
+int build_distance_matrix(TSPInstance *instance, DistanceFunc dist_func);
 double to_radians(double coord);
-int geo_distance(TSPInstance *instance);
+
 
 #endif
