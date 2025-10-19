@@ -5,6 +5,7 @@
 #include "../include/tsp_io.h"
 #include "../include/graph.h"
 #include "../include/tour.h"
+#include "../include/brute_force.h"
 
 void print_usage(const char *prog_name) {
     printf("Usage: %s -f tests/<tsp_file> [-c]\n", prog_name);
@@ -78,9 +79,11 @@ int main(int argc, char *argv[]) {
         double total_cost = compute_tour_cost(graph, tour, n);
         printf("Canonical tour cost: %lf\n", total_cost);
         free(tour);
+        free_graph(graph);
     }
     
-    free_graph(graph);
+    run_brute_force_graph(graph, instance.name);
+    
     free_half_matrix(instance.half_matrix);
     printf("[DEBUG] All memory freed. Exiting cleanly.\n");
     return 0;
