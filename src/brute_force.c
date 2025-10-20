@@ -128,17 +128,14 @@ void run_brute_force_graph(TSPGraph *graph, const char *instance_name) {
     double total_time = (double)(clock() - start) / CLOCKS_PER_SEC;
 
 
-    static int header_done = 0;
-    if (!header_done) {
-        printf("Instance ; Méthode ; Temps CPU (sec) ; Meilleure longueur ; Pire longueur ; Tour optimale ; Pire tournée\n");
-        header_done = 1;
+    printf("Tour %s bf %.3f %.0f [1", instance_name, total_time, best_len);
+    for (int i = 0; i < size; i++) {
+        printf(",%d", best[i] + 1);  /* no space after comma */
     }
-
-    printf("%s ; bf ; %.3f ; %.0f ; %.0f ; [1", instance_name, total_time, best_len, worst_len);
-    for (int i = 0; i < size; i++) printf(", %d", best[i] + 1);
-    printf("] ; [1");
-    for (int i = 0; i < size; i++) printf(", %d", worst[i] + 1);
     printf("]\n");
+
+
+
 
     free(perm);
     free(best);
