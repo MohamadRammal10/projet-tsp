@@ -27,9 +27,11 @@ int main(int argc, char *argv[]) {
     {
         if(strcmp(argv[i], "-f") == 0 && i + 1 < argc){
             filename = argv[++i];
-        } else if (strcmp(argv[i], "-c") == 0) {
+        } 
+        else if (strcmp(argv[i], "-c") == 0) {
             compute_canonical = 1;
-        } else {
+        } 
+        else {
             print_usage(argv[0]);
             return EXIT_FAILURE;
         }
