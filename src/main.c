@@ -1,87 +1,51 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include <time.h>
 
 #include "../include/tsp_io.h"
 #include "../include/graph.h"
 #include "../include/tour.h"
-
-void print_usage(const char *prog_name) {
-    printf("Usage: %s -f tests/<tsp_file> [-c]\n", prog_name);
-    printf("Options:\n");
-    printf(" -f <file>    Specify the TSP file to read\n");
-    printf(" -c           Compute and print canonical tour length\n");
-}
+#include "../include/brute_force.h"
+#include "../include/utils.h"
 
 int main(int argc, char *argv[]) {
-    if (argc < 3){
-        print_usage(argv[0]);  
-        return EXIT_FAILURE;
-    }
-    
-    char *filename = NULL;
-    int compute_canonical = 0;
-    
-    // --- Parse command-line args ---
-    for (int i = 1; i < argc; i++)
-    {
-        if(strcmp(argv[i], "-f") == 0 && i + 1 < argc){
-            filename = argv[++i];
-        } else if (strcmp(argv[i], "-c") == 0) {
-            compute_canonical = 1;
-        } else {
-            print_usage(argv[0]);
-            return EXIT_FAILURE;
-        }
+    const char *filename = NULL;
+    int do_canonical = 0;
+    int do_bf = 0;
+
+    /* ./tsp -h */
+    if(argc == 2 && !strcmp(argv[1], "-h")) {
+        usage(argv[0]);
+        return EXIT_SUCCESS;
     }
 
-    if (!filename) {
-        fprintf(stderr, "[ERROR] Missing file argument (-f <file> required)\n");
+    if (parse_args(argc, argv, &filename, &do_canonical, &do_bf) == -1){
         return EXIT_FAILURE;
     }
-    
-    printf("Projet TSP - initial version\n");
-    printf("Reading TSPLIB file: %s\n", filename);
 
-    // --- Load TSP instance ---
+    /* read file instance */
     TSPInstance instance;
-    if (read_tsplib(filename, &instance) != 0) {
-        printf("[ERROR] reading TSP file\n");
-        return EXIT_FAILURE;
-    }
+    if (read_tsplib(filename, &instance) != 0) return EXIT_FAILURE;
 
-    // --- Create graph (half matrix)---
+    /* create graph from instance*/
     TSPGraph *graph = create_graph(&instance);
-    if(!graph){
-        printf("[ERROR] Failed to create graph\n");
-        free_half_matrix(instance.half_matrix);
-        return EXIT_FAILURE;
-    }
+    if (!graph) { free_half_matrix(instance.half_matrix); return EXIT_FAILURE; }
 
-    print_graph(graph);
-
-    // --- Example tour and cost computation ---
-    // TODO: Refactor this into a separate function/module for tour generation
-    if (compute_canonical)
-    {
-        int n = graph->num_nodes;
-        int *tour = create_canonical_tour(n);
-        if (!tour) {
-            fprintf(stderr, "[ERROR] Memory allocation for tour failed\n");
-            free_graph(graph);
-            free_half_matrix(instance.half_matrix);
+    /* canonical mode: compute canonical tour */
+    if (do_canonical) {
+        if(canonical_mode(graph, instance) == -1) {
             return EXIT_FAILURE;
         }
-        
-        print_tour(tour,n);
-
-        double total_cost = compute_tour_cost(graph, tour, n);
-        printf("Canonical tour cost: %lf\n", total_cost);
-        free(tour);
     }
-    
+
+    /* brute force mode: function prints its own "Tour <name> bf ..." line */
+    if (do_bf) {
+        run_brute_force_graph(graph, instance.name);
+    }
+
     free_graph(graph);
     free_half_matrix(instance.half_matrix);
-    printf("[DEBUG] All memory freed. Exiting cleanly.\n");
+    printf("Successfully exited.\n");
     return 0;
 }

@@ -12,7 +12,7 @@
 double distance_euc_2d(double x1, double y1, double x2, double y2) {
     double dx = x1 - x2;
     double dy = y1 - y2;
-    return floor(sqrt(dx*dx + dy*dy) + 0.5);
+    return (double)sqrt(dx * dx + dy * dy);
 }
 
 /* ===============================
