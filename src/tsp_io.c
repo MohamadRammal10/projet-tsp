@@ -11,6 +11,13 @@
 #define M_PI 3.14159265358979323846
 #endif
 
+/**
+ * @brief Read .tsp file and saves its content into a TSPInstance structure.
+ * @param filename Path to the .tsp file.
+ * @param instance Pointer to TSPInstance structure to fill.
+ * @return -1 if an error occurs.
+ * @return 0 on success.
+ */
 int read_tsplib(const char *filename, TSPInstance *instance) {
     FILE *file = fopen(filename, "r");
     if (!file) {
@@ -21,23 +28,28 @@ int read_tsplib(const char *filename, TSPInstance *instance) {
     char line[256];
     while(fgets(line, sizeof(line), file)) {
         if (sscanf(line, "NAME : %s", instance->name) == 1) {
-            printf("[INFO] Name : %s\n", instance->name);
+            //printf("[INFO] Name : %s\n", instance->name);
+            continue;
         }
 
         else if (sscanf(line, "COMMENT : %[^\n]", instance->comment) == 1) {
-            printf("[INFO] Comment : %s\n", instance->comment);
+            //printf("[INFO] Comment : %s\n", instance->comment);
+            continue;
         }
 
         else if (sscanf(line, "TYPE : %s", instance->type) == 1) {
-            printf("[INFO] Type : %s\n", instance->type);
+            //printf("[INFO] Type : %s\n", instance->type);
+            continue;
         }        
         
         else if (sscanf(line, "DIMENSION : %d", &instance->dimension) == 1) {
-            printf("[INFO] Dimension : %d\n", instance->dimension);
+            //printf("[INFO] Dimension : %d\n", instance->dimension);
+            continue;
         }
 
         else if (sscanf(line, "EDGE_WEIGHT_TYPE : %s", instance->edge_weight_type) == 1) {
-            printf("[INFO] Edge weight type : %s\n", instance->edge_weight_type);
+            //printf("[INFO] Edge weight type : %s\n", instance->edge_weight_type);
+            continue;
         }
 
         else if (strncmp(line, "NODE_COORD_SECTION", 18) == 0) {
@@ -73,6 +85,11 @@ int read_tsplib(const char *filename, TSPInstance *instance) {
     return 0;
 }
 
+/**
+ * @brief Read node coordinates from the .tsp file.
+ * @return -1 if an error occurs.
+ * @return 0 on success.
+ */
 int read_node_coords(FILE *file, TSPInstance *instance){
     instance->coords = malloc(instance->dimension * sizeof(double *));
     if (!instance->coords) return -1;
@@ -91,37 +108,10 @@ int read_node_coords(FILE *file, TSPInstance *instance){
         }
         instance->coords[i][0] = x;
         instance->coords[i][1] = y;
-        printf("[DEBUG] Read coords: %d -> (%lf, %lf)\n", id, x, y);
+        //printf("  %d -> (%lf, %lf)\n", id, x, y);
     }
 
     return 0;
 }
 
-int build_distance_matrix(TSPInstance *instance,  DistanceFunc dist_func){
-    int n = instance->dimension;
-
-    instance->distances = malloc(n * sizeof(double *));
-    if (!instance->distances) return -1;
-
-    for (int i = 0; i < n; i++) {
-        instance->distances[i] = malloc(n * sizeof(double));
-        if (!instance->distances[i]) return -1;
-    }
-
-    for (int i = 0; i < n; i++) {
-        for (int j = 0; j < n; j++) {
-            if (i == j){
-                instance->distances[i][j] = 0.0;
-                
-            } else {
-                instance->distances[i][j] = dist_func(
-                    instance->coords[i][0], instance->coords[i][1],
-                    instance->coords[j][0], instance->coords[j][1]
-                );
-            }        
-        }
-    }
-    printf("[INFO] Distance matrix built (%d x %d)\n", n, n);
-    return 0;
-}
 

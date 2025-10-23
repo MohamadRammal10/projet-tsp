@@ -1,0 +1,6 @@
+- Adapter la fonction print_final_results dans brute_force.c
+à tout type de méthode (pour le moment seulement "bf")
+
+- Fix GEO.tsp reading file bug
+
+- Fix example.tsp python test (true, false)
