@@ -1,4 +1,4 @@
-NAME: att10
+NAME: example.tsp
 TYPE: TSP
 COMMENT: 10-city problem
 DIMENSION: 10
@@ -8,7 +8,7 @@ NODE_COORD_SECTION
 2 20.0 25.0
 3 15.0 35.0
 4 40.0 10.0
-5 25.0 45.0
+5 25.0 45.00
 6 55.0 20.0
 7 60.0 35.0
 8 30.0 40.0

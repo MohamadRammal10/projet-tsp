@@ -1,6 +1,8 @@
 """
 Soft ad hoc pour tester les programme C de résolution du tsp
 VD 8/2025
+Adapted for C program output format:
+Instance ; Méthode ; Temps CPU (sec) ; Meilleure longueur ; Pire longueur ; Tour optimale ; Pire tournée
 """
 import random,math
 import subprocess
@@ -15,28 +17,54 @@ from tsp_tools import *
 def extract_data(path,code,filename,method,distance_fct,coord,graphique):
     # interaction avec C avec subprocess
     if method == "-c": # canonical
-        command = command = [path+code, "-f",filename,"-c"]
+        command = [path+code, "-f",filename,"-c"]
     else: # autres balises
         command = [path+code, "-f",filename,"-m"]+method.split()
     #print("Commande = ",command) # debug
     txt = subprocess.run(command,capture_output=True,text=True)
-    lst = txt.stdout.split() # retour du C c'est une chaîne on en fait une liste de chaînes
-    lst = [i for i in lst if i != ":"] # on fait le ménage
-    lst = [i for i in lst if i != ";"]
-    #print("lst = ",lst) # vérif debug
-    try: # analyse de la chaîne renvoyé par subprocess. A adapter à votre cas
-        ind = lst.index('Tour')
-        nom = lst[ind+1]
-        algo = lst[ind+2]
-        tps = eval(lst[ind+3]) # float
-        length = int(eval(lst[ind+4])) # int
-        tour = eval(lst[ind+5]) # liste
-        l = fitness(tour,distance_fct,coord)
-        v = valid(tour)
-        print(f"{nom} ; {algo} ; {length} ; {l} ; {tps} ; {tour} ; {v==0} ; {l==length}")
-        graphique(tour,algo,coord)
+    
+    # Parse the C program output with the new format
+    lines = txt.stdout.split('\n')
+    
+    # Find the data line (skip header)
+    data_line = None
+    for line in lines:
+        if line.strip() and not line.startswith("Instance"):
+            data_line = line
+            break
+    
+    if data_line is None:
+        print(f"Erreur: Pas de données trouvées dans la sortie C. stdout: {txt.stdout}")
+        return
+    
+    # Parse the CSV-style output
+    parts = [part.strip() for part in data_line.split(';')]
+    
+    try:
+        if len(parts) >= 6:  # We need at least 6 parts for basic info
+            nom = parts[0]  # Instance name
+            algo = parts[1]  # Method
+            tps = float(parts[2])  # Time
+            length_c = int(float(parts[3]))  # Best length from C
+            # parts[4] is worst length - we don't need it
+            tour_str = parts[5]  # Best tour string
+            
+            # Convert tour string to list
+            # Remove brackets and split by commas
+            tour_str_clean = tour_str.strip('[]')
+            tour = [int(x.strip()) for x in tour_str_clean.split(',')]
+            
+            # Calculate fitness and validity using Python
+            l = fitness(tour, distance_fct, coord)
+            v = valid(tour)
+            
+            print(f"{nom} ; {algo} ; {length_c} ; {l} ; {tps} ; {tour} ; {v==0} ; {l==length_c}")
+            graphique(tour,algo,coord)
+        else:
+            print(f"Erreur: Format de sortie incorrect. Parts: {parts}")
+            
     except Exception as e:
-        print(f"Erreur (Python) e = {e} lst = {lst}")
+        print(f"Erreur (Python) e = {e} lors du parsing de: {data_line}")
 
 def load_instance(filename):
     # utilise fcts tsplib95
@@ -59,7 +87,7 @@ def test_instance(filename,methods):
     print("Instance ; algo ; long (C) ; long (Python) ; temps ; tour ; valid ; mêmes longueurs")
 
     for m in methods:
-        extract_data(path,code,filename,m,distance_fct,coord,graphique) # l'exécutable C s'appelle tsp dans mon cas.
+        extract_data(path,code,filename,m,distance_fct,coord,graphique)
 
 def tests_instances_list(instances_file,methods):
     # lance le programme C avec toutes les options de methods
@@ -71,7 +99,7 @@ def tests_instances_list(instances_file,methods):
 # Liste de paramètres.
 # opt = tsplib95.load_solution(filename+'.opt.tour') pour charger un pyfichier solution dans python
 #filename = "burma14.tsp"
-filename = "geo.tsp" #
+filename = "example.tsp" # using a smaller instance for brute force
 path = "../" # adaptez à votre cas
 code = "tsp" # nom du programme C
 methods = ["bf"]
