@@ -1,1 +1,3 @@
+./example.tsp
+./att10.tsp
 ./geo.tsp

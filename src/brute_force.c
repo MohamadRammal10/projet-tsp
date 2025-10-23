@@ -8,26 +8,73 @@
 #include "../include/brute_force.h"
 #include "../include/tour.h"
 
+/* --- Structure de données pour l'état de l'algorithme --- */
 
-//  intercepter Ctrl+C 
+/**
+ * @brief Contient toutes les données nécessaires à l'exécution 
+ * de l'algorithme de force brute.
+ */
+typedef struct {
+    TSPGraph *graph;
+    int n;           // Nombre total de nœuds
+    int size;        // Taille de la permutation (n - 1)
+
+    int *perm;       // Permutation courante [1, ..., n-1]
+    int *best;       // Meilleure permutation trouvée
+    int *worst;      // Pire permutation trouvée
+    int *tour;       // Tampon pour le tour complet [0, perm..., 0]
+
+    double best_len;
+    double worst_len;
+    unsigned long long iterations;
+    clock_t start_time;
+
+    const char *instance_name;
+} BruteForceState;
+
+/* --- Variables globales pour la gestion du signal --- */
+
+/**
+ * @brief Drapeau (flag) pour la gestion de l'interruption (Ctrl+C).
+ * 
+ * 'volatile' empêche le compilateur d'optimiser les accès.
+ * 'sig_atomic_t' garantit des écritures/lectures atomiques.
+ */
 static volatile sig_atomic_t stop_flag = 0;
-static void sigint_handler(int s) { (void)s; stop_flag = 1; }
 
-// permutation ordre lexicographique
+/**
+ * @brief Gestionnaire de signal pour SIGINT (Ctrl+C).
+ * Ne fait que lever le drapeau d'arrêt.
+ */
+static void sigint_handler(int s) {
+    (void)s; // Évite l'avertissement "unused parameter"
+    stop_flag = 1;
+}
+
+/**
+ * @brief Calcule la permutation suivante dans l'ordre lexicographique.
+ * @return 1 si une nouvelle permutation a été trouvée, 0 si c'était la dernière.
+ */
 static int next_permutation(int *array, int length) {
+    // 1. Trouver le plus grand indice i t.q. array[i] < array[i+1]
     int i = length - 2;
     while (i >= 0 && array[i] >= array[i + 1]) {
         i--;
     }
-    if (i < 0) return 0;
+    if (i < 0) return 0; // C'était la dernière permutation
+
+    // 2. Trouver le plus grand indice j > i t.q. array[j] > array[i]
     int j = length - 1;
     while (array[j] <= array[i]) {
         j--;
     }
 
+    // 3. Échanger array[i] et array[j]
     int temp = array[i];
     array[i] = array[j];
     array[j] = temp;
+
+    // 4. Inverser la sous-séquence de i+1 à la fin
     int left = i + 1;
     int right = length - 1;
     while (left < right) {
@@ -40,106 +87,248 @@ static int next_permutation(int *array, int length) {
     return 1;
 }
 
-void run_brute_force_graph(TSPGraph *graph, const char *instance_name) {
-    if (!graph) return;
-    signal(SIGINT, sigint_handler);  /* gérer Ctrl+C */
+/* --- Fonctions de gestion de l'état --- */
 
-    int n = graph->num_nodes;
-    if (n <= 1) return;
-    int size = n - 1; /* on fixe la ville 0 */
+/**
+ * @brief Libère toute la mémoire allouée pour l'état.
+ * (Déplacée avant 'create' car 'create' l'utilise en cas d'erreur)
+ */
+static void free_brute_force_state(BruteForceState *state) {
+    if (state) {
+        free(state->perm);
+        free(state->best);
+        free(state->worst);
+        free(state->tour);
+        free(state);
+    }
+}
 
-    /* allocations */
-    int *perm = malloc(size * sizeof(int));
-    int *best = malloc(size * sizeof(int));
-    int *worst = malloc(size * sizeof(int));
-    int *tour = malloc((n + 1) * sizeof(int));
-    if (!perm || !best || !worst || !tour) { perror("malloc"); exit(1); }
+/**
+ * @brief Initialise les champs et alloue les tampons pour la structure d'état.
+ * @return 1 en cas de succès, 0 en cas d'échec d'allocation.
+ */
+static int init_brute_force_state(BruteForceState *state, TSPGraph *graph, const char *instance_name) {
+    state->graph = graph;
+    state->n = graph->num_nodes;
+    state->size = state->n - 1; // On fixe la ville 0
+    state->instance_name = instance_name;
 
-    /* initialisation [1,2,...,n-1] */
-    for (int i = 0; i < size; i++) {
-        perm[i] = i + 1;
-        best[i] = perm[i];
-        worst[i] = perm[i];
+    // Initialiser les pointeurs à NULL garantit que free_brute_force_state
+    // est sûr même en cas d'échec d'allocation partiel.
+    state->perm = NULL;
+    state->best = NULL;
+    state->worst = NULL;
+    state->tour = NULL;
+
+    // Allocations des tableaux
+    state->perm = malloc(state->size * sizeof(int));
+    state->best = malloc(state->size * sizeof(int));
+    state->worst = malloc(state->size * sizeof(int));
+    state->tour = malloc((state->n + 1) * sizeof(int)); // Tour complet [0, ..., 0]
+
+    if (!state->perm || !state->best || !state->worst || !state->tour) {
+        perror("malloc state arrays");
+        return 0; // Échec
     }
 
-    double best_len = DBL_MAX;
-    double worst_len = -DBL_MAX;
-    unsigned long long iterations = 0;
-    clock_t start = clock();
-
-    int finished = 0;
-    while (!finished) {
-        /* construire tour [0, perm..., 0] */
-        tour[0] = 0;
-        for (int i = 0; i < size; i++) tour[i + 1] = perm[i];
-        tour[n] = 0;
-
-        double len = compute_tour_cost(graph, tour, n + 1);
-        iterations++;
-
-        if (len < best_len) {
-            best_len = len;
-            for (int i = 0; i < size; i++) best[i] = perm[i];
-        }
-        if (len > worst_len) {
-            worst_len = len;
-            for (int i = 0; i < size; i++) worst[i] = perm[i];
-        }
-
-        // Ctrl+C 
-        if (stop_flag) {
-            stop_flag = 0;
-            double elapsed = (double)(clock() - start) / CLOCKS_PER_SEC;
-
-            printf("\n--- Interruption (Ctrl+C) ---\n");
-            printf("Permutation courante (0-based) : [");
-            for (int i = 0; i < size; i++) { if (i) printf(", "); printf("%d", perm[i]); }
-            printf("]\n");
-            printf("Tournée courante (1-based) : [1");
-            for (int i = 0; i < size; i++) printf(", %d", perm[i] + 1);
-            printf("]\n");
-
-            printf("Meilleure longueur : %.0f | Meilleure tournée : [1", best_len);
-            for (int i = 0; i < size; i++) printf(", %d", best[i] + 1);
-            printf("]\n");
-
-            printf("Pire longueur : %.0f | Pire tournée : [1", worst_len);
-            for (int i = 0; i < size; i++) printf(", %d", worst[i] + 1);
-            printf("]\n");
-
-            printf("Itérations : %llu | Temps CPU : %.3fs\n", iterations, elapsed);
-            printf("Voulez-vous quitter ? [y/n] ");
-            int c = getchar();
-            while (c == '\n') c = getchar();
-            if (c == 'y' || c == 'Y') {
-                printf("Sortie demandée.\n");
-                free(perm); free(best); free(worst); free(tour);
-                return;
-            }
-            while (c != '\n' && c != EOF) c = getchar();
-            signal(SIGINT, sigint_handler);
-            printf("Reprise du calcul...\n");
-        }
-
-        /* prochaine permutation ou fin */
-        if (!next_permutation(perm, size)) finished = 1;
+    // Initialisation
+    for (int i = 0; i < state->size; i++) {
+        state->perm[i] = i + 1;  // perm = [1, 2, ..., n-1]
+        state->best[i] = state->perm[i];
+        state->worst[i] = state->perm[i];
     }
 
-    double total_time = (double)(clock() - start) / CLOCKS_PER_SEC;
+    state->best_len = DBL_MAX;
+    state->worst_len = -DBL_MAX;
+    state->iterations = 0;
+    state->start_time = clock();
+
+    return 1; // Succès
+}
+
+/**
+ * @brief Alloue et initialise la structure d'état.
+ */
+static BruteForceState *create_brute_force_state(TSPGraph *graph, const char *instance_name) {
+    BruteForceState *state = malloc(sizeof(BruteForceState));
+    if (!state) {
+        perror("malloc BruteForceState");
+        return NULL;
+    }
+
+    // Appel de la nouvelle fonction d'initialisation
+    if (!init_brute_force_state(state, graph, instance_name)) {
+        free_brute_force_state(state);
+        return NULL;
+    }
+
+    return state;
+}
 
 
-    printf("Tour %s bf %.3f %.0f [1", instance_name, total_time, best_len);
+/* --- Fonctions utilitaires d'impression --- */
+
+/**
+ * @brief Affiche une tournée (permutation 1-basée) sur une seule ligne.
+ * Ex: [1, 3, 2, 4]
+ */
+static void print_tour_inline(const int *perm, int size) {
+    printf("[1");
     for (int i = 0; i < size; i++) {
-        printf(",%d", best[i] + 1);  /* no space after comma */
+        printf(", %d", perm[i] + 1);
+    }
+    printf("]");
+}
+
+/**
+ * @brief Affiche les résultats finaux au format CSV normalisé.
+ * TODO: Adapter la fonction pour tout type de méthode (ici seulement "bf") 
+ */
+static void print_final_results(BruteForceState *state) {
+    double total_time = (double)(clock() - state->start_time) / CLOCKS_PER_SEC;
+
+    static int header_done = 0;
+    if (!header_done) {
+        printf("Instance ; Méthode ; Temps CPU (sec) ; Meilleure longueur ; Pire longueur ; Tour optimale ; Pire tournée\n");
+        header_done = 1;
+    }
+
+    // Affiche la ligne de résultat
+    printf("%s ; bf ; %.3f ; %.0f ; %.0f ; ", 
+           state->instance_name, total_time, state->best_len, state->worst_len);
+    
+    print_tour_inline(state->best, state->size);
+    printf(" ; ");
+    print_tour_inline(state->worst, state->size);
+    printf("\n");
+}
+
+/* --- Fonctions cœur de l'algorithme --- */
+
+/**
+ * @brief Évalue la permutation courante stockée dans 'state->perm'.
+ * Met à jour les meilleurs/pires tours et longueurs.
+ */
+static void evaluate_current_permutation(BruteForceState *state) {
+    // Construire le tour complet [0, perm..., 0]
+    state->tour[0] = 0;
+    for (int i = 0; i < state->size; i++) {
+        state->tour[i + 1] = state->perm[i];
+    }
+    state->tour[state->n] = 0;
+
+    // Calculer le coût
+    double len = compute_tour_cost(state->graph, state->tour, state->n + 1);
+    state->iterations++;
+
+    // Mettre à jour le meilleur
+    if (len < state->best_len) {
+        state->best_len = len;
+        memcpy(state->best, state->perm, state->size * sizeof(int));
+    }
+    // Mettre à jour le pire
+    if (len > state->worst_len) {
+        state->worst_len = len;
+        memcpy(state->worst, state->perm, state->size * sizeof(int));
+    }
+}
+
+/**
+ * @brief Gère l'interruption Ctrl+C.
+ * Affiche l'état actuel et demande à l'utilisateur s'il veut arrêter.
+ * @return 1 si l'utilisateur veut arrêter, 0 pour continuer.
+ */
+static int handle_interrupt(BruteForceState *state) {
+    stop_flag = 0; // Réinitialiser le drapeau
+    double elapsed = (double)(clock() - state->start_time) / CLOCKS_PER_SEC;
+
+    printf("\n--- Interruption (Ctrl+C) ---\n");
+
+    // Permutation courante (0-basée)
+    printf("Permutation courante (0-based) : [");
+    for (int i = 0; i < state->size; i++) {
+        if (i) printf(", ");
+        printf("%d", state->perm[i]);
     }
     printf("]\n");
 
+    // Tournée courante (1-basée)
+    printf("Tournée courante (1-based) : ");
+    print_tour_inline(state->perm, state->size);
+    printf("\n");
 
+    // Meilleur trouvé
+    printf("Meilleure longueur : %.0f | Meilleure tournée : ", state->best_len);
+    print_tour_inline(state->best, state->size);
+    printf("\n");
 
+    // Pire trouvé
+    printf("Pire longueur : %.0f | Pire tournée : ", state->worst_len);
+    print_tour_inline(state->worst, state->size);
+    printf("\n");
 
-    free(perm);
-    free(best);
-    free(worst);
-    free(tour);
+    printf("Itérations : %llu | Temps CPU : %.3fs\n", state->iterations, elapsed);
+    
+    // Demander à l'utilisateur
+    printf("Voulez-vous quitter ? [y/n] ");
+    int c = getchar();
+    while (c == '\n') c = getchar(); // Ignorer les sauts de ligne précédents
 
+    int stop = (c == 'y' || c == 'Y');
+
+    // Vider le buffer d'entrée
+    while (c != '\n' && c != EOF) c = getchar(); 
+
+    if (stop) {
+        printf("Sortie demandée.\n");
+        return 1; // Arrêter
+    } else {
+        signal(SIGINT, sigint_handler); // Ré-enregistrer le gestionnaire
+        printf("Reprise du calcul...\n");
+        return 0; // Continuer
+    }
+}
+
+/* --- Fonction publique (Point d'entrée) --- */
+
+/**
+ * @brief Exécute l'algorithme de force brute pour le TSP.
+ * (Implémentation de la fonction déclarée dans brute_force.h)
+ */
+void run_brute_force_graph(TSPGraph *graph, const char *instance_name) {
+    if (!graph) return;
+    if (graph->num_nodes <= 1) return;
+
+    // Enregistrer le gestionnaire de signal
+    signal(SIGINT, sigint_handler);
+
+    // Initialiser l'état de l'algorithme
+    BruteForceState *state = create_brute_force_state(graph, instance_name);
+    if (!state) {
+        exit(1); // Échec de l'allocation
+    }
+
+    int finished = 0;
+    while (!finished) {
+        // 1. Évaluer la permutation actuelle
+        evaluate_current_permutation(state);
+
+        // 2. Gérer une éventuelle interruption
+        if (stop_flag) {
+            if (handle_interrupt(state)) {
+                break; // L'utilisateur a demandé l'arrêt
+            }
+        }
+
+        // 3. Calculer la permutation suivante
+        if (!next_permutation(state->perm, state->size)) {
+            finished = 1; // C'était la dernière permutation
+        }
+    }
+
+    if (finished) {
+        print_final_results(state);
+    }
+
+    free_brute_force_state(state);
 }

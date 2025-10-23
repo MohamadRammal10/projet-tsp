@@ -121,9 +121,6 @@ def select_fct(edge_type):
             distance_fct = dist_geo2km
             graphique = show_tour_geo
             print("distance géométrique")
-        case 'EXPLICIT':
-            distance_fct = dist_mat
-            #graphique = pas prévu
         case 'EUC_2D':
             distance_fct = distance_eucl
             graphique = show_tour
