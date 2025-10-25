@@ -1,5 +1,5 @@
 NAME : att10
-COMMENT : 10 premiers de att48)+0
+COMMENT : 10 premiers de att48
 TYPE : TSP
 DIMENSION : 10
 EDGE_WEIGHT_TYPE : ATT

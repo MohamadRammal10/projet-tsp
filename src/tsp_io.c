@@ -108,7 +108,7 @@ int read_node_coords(FILE *file, TSPInstance *instance){
         }
         instance->coords[i][0] = x;
         instance->coords[i][1] = y;
-        //printf("  %d -> (%lf, %lf)\n", id, x, y);
+        printf(" [DEBUG]  %d -> (%lf, %lf)\n", id, x, y);
     }
 
     return 0;
