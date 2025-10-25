@@ -194,7 +194,7 @@ static void print_final_results(BruteForceState *state) {
     }
 
     // Affiche la ligne de résultat
-    printf("%s ; bf ; %.3f ; %.0f ; %.0f ; ", 
+    printf("%s ; bf ; %.3f ; %.8f ; %.8f ; ", 
            state->instance_name, total_time, state->best_len, state->worst_len);
     
     print_tour_inline(state->best, state->size);
@@ -258,7 +258,7 @@ static int handle_interrupt(BruteForceState *state) {
     printf("\n");
 
     // Meilleur trouvé
-    printf("Meilleure longueur : %.0f | Meilleure tournée : ", state->best_len);
+    printf("Meilleure longueur : %.8f | Meilleure tournée : ", state->best_len);
     print_tour_inline(state->best, state->size);
     printf("\n");
 
