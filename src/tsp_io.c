@@ -2,6 +2,8 @@
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
+#include <locale.h>
+
 
 #include "../include/tsp_io.h"
 #include "../include/distance.h"
@@ -98,20 +100,20 @@ int read_node_coords(FILE *file, TSPInstance *instance){
         instance->coords[i] = malloc(2 * sizeof(double));
         if (!instance->coords[i]) return -1;
     }
+    //fix
+    setlocale(LC_NUMERIC, "C");
 
     for (int i = 0; i < instance->dimension; i++) {
         int id;
         double x, y;
+
         if (fscanf(file, "%d %lf %lf", &id, &x, &y) != 3) {
             fprintf(stderr, "Error reading coordinates for node %d\n", i+1);
             return -1;
         }
         instance->coords[i][0] = x;
         instance->coords[i][1] = y;
-        printf(" [DEBUG]  %d -> (%lf, %lf)\n", id, x, y);
+        //printf("  %d -> (%lf, %lf)\n", id, x, y);
     }
-
     return 0;
 }
-
-

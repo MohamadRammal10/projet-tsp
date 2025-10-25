@@ -52,20 +52,27 @@ int parse_args(int argc, char *argv[], const char **filename, int *do_canonical,
  * @return 0 on success.
  */
 int canonical_mode(TSPGraph *graph, TSPInstance instance){
+    if (!graph) return -1;
     int n = graph->num_nodes;
+    if (n <= 0) return -1;
+
+    /* construire la tournée canonique [0,1,2,...,n-1,0] */
     int *tour = malloc((n + 1) * sizeof(int));
-    if (!tour) { 
-        free_graph(graph);
-        free_half_matrix(instance.half_matrix);
-        return -1;
-    }
+    if (!tour) return -1;
+    for (int i = 0; i < n; ++i) tour[i] = i;
+    tour[n] = 0; /* retour */
 
-    tour[0] = 0;
-    for (int i = 1; i < n; i++) tour[i] = i;  /* 0,1,2,...,n-1 */
-    tour[n] = 0;                              /* return to start */
-
+    clock_t t0 = clock();
     double len = compute_tour_cost(graph, tour, n + 1);
+    double secs = (double)(clock() - t0) / CLOCKS_PER_SEC;
+
+    printf("Instance ; Méthode ; Temps CPU (sec) ; Longueur ; Tour\n");
+
+    printf("%s ; canonical ; %.2f ; %.2f ; [1", instance.name, secs, len);
+    for (int i = 1; i < n; ++i) printf(",%d", i + 1);
+    printf("]\n");
 
     free(tour);
-    return len;
+    return 0;
+
 }

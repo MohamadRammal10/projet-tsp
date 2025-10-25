@@ -23,6 +23,14 @@ int main(int argc, char *argv[]) {
     if (parse_args(argc, argv, &filename, &do_canonical, &do_bf) == -1){
         return EXIT_FAILURE;
     }
+    if (!filename) {
+        usage(argv[0]);
+        return EXIT_SUCCESS;
+    }
+
+    if (parse_args(argc, argv, &filename, &do_canonical, &do_bf) == -1){
+        return EXIT_FAILURE;
+    }
 
     /* read file instance */
     TSPInstance instance;
@@ -34,7 +42,10 @@ int main(int argc, char *argv[]) {
 
     /* canonical mode: compute canonical tour */
     if (do_canonical) {
-        if(canonical_mode(graph, instance) == -1) {
+        int rc = canonical_mode(graph, instance);
+        if(rc == -1) {
+            free_graph(graph);
+            free_half_matrix(instance.half_matrix);
             return EXIT_FAILURE;
         }
     }
