@@ -23,6 +23,10 @@ int main(int argc, char *argv[]) {
     if (parse_args(argc, argv, &filename, &do_canonical, &do_bf) == -1){
         return EXIT_FAILURE;
     }
+    if (!filename) {
+        usage(argv[0]);
+        return EXIT_FAILURE;
+    }
 
     /* read file instance */
     TSPInstance instance;
@@ -35,8 +39,31 @@ int main(int argc, char *argv[]) {
     /* canonical mode: compute canonical tour */
     if (do_canonical) {
         if(canonical_mode(graph, instance) == -1) {
+            free_graph(graph);
+            free_half_matrix(instance.half_matrix);
             return EXIT_FAILURE;
         }
+        int n = graph->num_nodes;
+
+    int *tour = malloc((n + 1) * sizeof(int));
+    if (!tour) {
+        fprintf(stderr, "[ERROR] malloc tour\n");
+        free_graph(graph);
+        free_half_matrix(instance.half_matrix);
+        return EXIT_FAILURE;
+    }
+    for (int i = 0; i < n; ++i) tour[i] = i;
+    tour[n] = 0;
+
+    clock_t t0 = clock();
+    double len  = compute_tour_cost(graph, tour, n + 1);
+    double secs = (double)(clock() - t0) / CLOCKS_PER_SEC;
+
+    printf("Instance ; Méthode ; Temps CPU (sec) ; Longueur ; Tour\n");
+    printf("%s ; canonical ; %.2f ; %.2f ; [1", instance.name, secs, len);
+    for (int i = 1; i < n; ++i) printf(",%d", i + 1);
+    printf("]\n");
+    free(tour);
     }
 
     /* brute force mode: function prints its own "Tour <name> bf ..." line */
