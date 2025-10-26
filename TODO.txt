@@ -1,21 +1,30 @@
 - Adapter la fonction print_final_results dans brute_force.c
 à tout type de méthode (pour le moment seulement "bf")
 
-- Fix GEO.tsp reading file bug
+- Fix GEO.tsp reading file bug [DONE]
 
-- Fix example.tsp python test (true, false)
+- Fix example.tsp python test (true, false) [DONE]
 
-- Fix -c and -m     
+- Fix -c and -m  [DONE]   
 
 
 -------
 
-- Fix EUC_2D C : 142 vs Python : 142.801230496181
+- Fix EUC_2D C : 142 vs Python : 142.801230496181 [DONE]
 
-- Fix CANONICAL METHOD!!!!!!!!!!!!!!
+- Fix CANONICAL METHOD!!!!!!!!!!!!!! [DONE]
 
 - Check the matrix
 
-- ADD PRINT TO JUST -f
+- ADD PRINT TO JUST -f [DONE]
 
-- ADD DEBUG MODE
+- ADD DEBUG MODE [DONE]
+
+
+------ [TODO] 10/26
+
+- Compare canonical form in python script
+
+- Clean python script code
+
+- Do requirement checklist

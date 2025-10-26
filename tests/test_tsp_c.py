@@ -80,8 +80,7 @@ def test_instance(filename,methods):
     # affiche la banière des résultats et appelle les programme C
     instance,coord,edge_type = load_instance(filename)
     distance_fct,graphique = select_fct(edge_type)
-    can_len = instance.trace_canonical_tour()
-    print("Longueur du tour canonique (tsplib95 built in) =",can_len)
+    print( "Canonique (Python)",instance.trace_canonical_tour())
     print("Instance ; algo ; long (C) ; long (Python) ; temps ; tour ; valid ; mêmes longueurs")
 
     for m in methods:
@@ -100,7 +99,7 @@ def tests_instances_list(instances_file,methods):
 filename = "example.tsp" # using a smaller instance for brute force
 path = "../" # adaptez à votre cas
 code = "tsp" # nom du programme C
-methods = ["bf"]
+methods = ["-c"]
 
 #test_instance(filename,methods) # pour un seul appel
 tests_instances_list("./instances.txt",methods) # marche si le C marche
