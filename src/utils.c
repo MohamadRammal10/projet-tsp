@@ -30,6 +30,13 @@ void usage(const char *p) {
     printf("  -f <file>    TSPLIB instance file\n");
     printf("  -c           Compute and print canonical tour\n");
     printf("  -m bf        Run brute-force search and print tour\n");
+
+    printf("\n");
+    printf(" -> Testing :\n");
+    printf("   Run the test script 'test_tsp_c.py' located in the /tests/ folder\n");
+    printf("   Look for the config in the script and choose between canonical mode (-c) or brute-force mode (-m bf)\n");
+    printf("   Add .tsp file names to instances.txt to test multiple instances in one go.\n");
+
 }
 
 /**

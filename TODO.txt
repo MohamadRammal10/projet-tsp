@@ -23,8 +23,8 @@
 
 ------ [TODO] 10/26
 
-- Compare canonical form in python script
+- Compare canonical form in python script [DONE]
 
-- Clean python script code
+- Clean python script code @fourat
 
-- Do requirement checklist
+- Do requirement checklist [DONE]
