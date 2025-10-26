@@ -99,7 +99,7 @@ def tests_instances_list(instances_file,methods):
 filename = "example.tsp" # using a smaller instance for brute force
 path = "../" # adaptez à votre cas
 code = "tsp" # nom du programme C
-methods = ["-c"]
+methods = ["bf"]
 
 #test_instance(filename,methods) # pour un seul appel
 tests_instances_list("./instances.txt",methods) # marche si le C marche

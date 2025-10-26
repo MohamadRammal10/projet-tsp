@@ -98,8 +98,11 @@ int canonical_mode(TSPGraph *graph, TSPInstance instance){
     printf("Instance ; Méthode ; Temps CPU (sec) ; Longueur ; Tour\n");
 
     printf("%s ; canonical ; %.2f ; %.2f ;", instance.name, secs, len);
-    print_tour(tour, n);
-    printf("\n");
+    printf("[1");
+    for (int i = 1; i < n; i++) {
+        printf(", %d", tour[i]+1);
+    }
+    printf("]\n");
     free(tour);
     return len;
 }
