@@ -7,6 +7,7 @@
 #include "../include/graph.h"
 #include "../include/utils.h"
 #include "../include/tour.h"
+#include "../include/brute_force.h"
 
 /**
  * @brief Print usage information.
@@ -14,8 +15,17 @@
  * ./tsp -h to show this message.
  */
 void usage(const char *p) {
-    printf("Usage: %s -f <file> [-c] [-m bf]\n", p);
-    printf("Options:\n");
+    printf("-> Make options :\n");
+    printf("  make              Compile project\n");
+    printf("  make debug        Compile project + debug mode\n");
+    printf("  make clean        Clean .o files\n");
+    printf("\n");
+
+    printf("Usage: %s -f <file> [-c] [-m <mode>] [-d]\n", p);
+
+    printf("\n");
+
+    printf("-> Options :\n");
     printf("  -h           Show this help message.\n");
     printf("  -f <file>    TSPLIB instance file\n");
     printf("  -c           Compute and print canonical tour\n");
@@ -27,27 +37,48 @@ void usage(const char *p) {
  * @return -1 if an error occurs.
  * @return 0 on success.
  */
-int parse_args(int argc, char *argv[], const char **filename, int *do_canonical, int *do_bf){    
+int parse_args(int argc, char *argv[], const char **filename, int *can, int *bf){ 
+    if((argc == 2 && !strcmp(argv[1], "-h")) || argc == 1 ) {
+        usage(argv[0]);
+        return EXIT_SUCCESS;
+    }
+
+    if (!filename) { 
+        usage(argv[0]);
+        return EXIT_SUCCESS;
+    }
+
     for(int i = 1; i < argc; i++) {
         if (!strcmp(argv[i], "-f") && i + 1 < argc) {
             *filename = argv[++i];
-        } else if (!strcmp(argv[i], "-c")) {
-            *do_canonical = 1;
-        } else if (!strcmp(argv[i], "-m") && i + 1 < argc) {
-            if (!strcmp(argv[i+1], "bf")) { *do_bf = 1; i++; }
-            else { usage(argv[0]); return -1;}
+        } 
+        else if (!strcmp(argv[i], "-c")) {
+            *can = 1;
         }
-        else {
+        else if (!strcmp(argv[i], "-m") && i + 1 < argc) {
+            if (!strcmp(argv[i+1], "bf")) { 
+                *bf = 1;
+                i++;
+            } else { 
+                printf("Specify the algorithm after -m.\n");
+                usage(argv[0]);
+                return -1;
+            }
+            //TODO: next modes : nn, rw, 2opt, ga
+        } else {
             usage(argv[0]);
             return -1;
         }
     }
+
     return 0;
 }
 
 /**
  * @brief Canonical mode.
  * Calculate the canonical tour.
+ * @param graph TSP graph.
+ * @param instance TSP instance.
  * @return -1 if an error occurs
  * @return 0 on success.
  */
@@ -56,11 +87,9 @@ int canonical_mode(TSPGraph *graph, TSPInstance instance){
     int n = graph->num_nodes;
     if (n <= 0) return -1;
 
-    /* construire la tournée canonique [0,1,2,...,n-1,0] */
-    int *tour = malloc((n + 1) * sizeof(int));
+    /* city 1 -> city 2 -> ... -> city 1 [0,1,2,...,n-1,0] */
+    int *tour = create_canonical_tour(n);
     if (!tour) return -1;
-    for (int i = 0; i < n; ++i) tour[i] = i;
-    tour[n] = 0; /* retour */
 
     clock_t t0 = clock();
     double len = compute_tour_cost(graph, tour, n + 1);
@@ -68,11 +97,27 @@ int canonical_mode(TSPGraph *graph, TSPInstance instance){
 
     printf("Instance ; Méthode ; Temps CPU (sec) ; Longueur ; Tour\n");
 
-    printf("%s ; canonical ; %.2f ; %.2f ; [1", instance.name, secs, len);
-    for (int i = 1; i < n; ++i) printf(",%d", i + 1);
-    printf("]\n");
-
+    printf("%s ; canonical ; %.2f ; %.2f ;", instance.name, secs, len);
+    print_tour(tour, n);
+    printf("\n");
     free(tour);
-    return 0;
+    return len;
+}
 
+/**
+ * @brief Affiche les résultats finaux au format CSV normalisé.
+ * TODO: Adapter la fonction pour tout type de méthode (ici seulement "bf") 
+ */
+void print_final_results(BruteForceState *state) {
+    double total_time = (double)(clock() - state->start_time) / CLOCKS_PER_SEC;
+    printf("Instance ; Methode ; Temps CPU (sec) ; Meilleure longueur ; Pire longueur ; Tour optimale ; Pire tournée\n");
+
+    // TODO: ADAPT TO ALL METHODS "bf"
+    printf("%s ; bf ; %.3f ; %.12f ; %.12f ; ", 
+           state->instance_name, total_time, state->best_len, state->worst_len);
+    
+    print_tour(state->best, state->size);
+    printf(" ; ");
+    print_tour(state->worst, state->size);
+    printf("\n");
 }

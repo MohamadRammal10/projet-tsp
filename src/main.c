@@ -11,24 +11,11 @@
 
 int main(int argc, char *argv[]) {
     const char *filename = NULL;
-    int do_canonical = 0;
-    int do_bf = 0;
+    int can = 0;
+    double can_len = 0.0;
+    int bf = 0;
 
-    /* ./tsp -h */
-    if(argc == 2 && !strcmp(argv[1], "-h")) {
-        usage(argv[0]);
-        return EXIT_SUCCESS;
-    }
-
-    if (parse_args(argc, argv, &filename, &do_canonical, &do_bf) == -1){
-        return EXIT_FAILURE;
-    }
-    if (!filename) {
-        usage(argv[0]);
-        return EXIT_SUCCESS;
-    }
-
-    if (parse_args(argc, argv, &filename, &do_canonical, &do_bf) == -1){
+    if (parse_args(argc, argv, &filename, &can, &bf) == -1){
         return EXIT_FAILURE;
     }
 
@@ -41,19 +28,26 @@ int main(int argc, char *argv[]) {
     if (!graph) { free_half_matrix(instance.half_matrix); return EXIT_FAILURE; }
 
     /* canonical mode: compute canonical tour */
-    if (do_canonical) {
-        int rc = canonical_mode(graph, instance);
-        if(rc == -1) {
+    if (can) {
+        if((can_len = canonical_mode(graph, instance)) == -1) {
             free_graph(graph);
             free_half_matrix(instance.half_matrix);
             return EXIT_FAILURE;
         }
     }
 
-    /* brute force mode: function prints its own "Tour <name> bf ..." line */
-    if (do_bf) {
+    /* Brute force solution */
+    if (bf) {
         run_brute_force_graph(graph, instance.name);
     }
+
+    //TODO : Nearest neighbor algorithm
+
+    //TODO : Random walk algorithm
+
+    //TODO : 2-opt algorithm
+
+    //TODO : Genetic algorithm
 
     free_graph(graph);
     free_half_matrix(instance.half_matrix);

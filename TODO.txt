@@ -4,3 +4,18 @@
 - Fix GEO.tsp reading file bug
 
 - Fix example.tsp python test (true, false)
+
+- Fix -c and -m     
+
+
+-------
+
+- Fix EUC_2D C : 142 vs Python : 142.801230496181
+
+- Fix CANONICAL METHOD!!!!!!!!!!!!!!
+
+- Check the matrix
+
+- ADD PRINT TO JUST -f
+
+- ADD DEBUG MODE

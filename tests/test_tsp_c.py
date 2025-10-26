@@ -41,11 +41,11 @@ def extract_data(path,code,filename,method,distance_fct,coord,graphique):
     parts = [part.strip() for part in data_line.split(';')]
     
     try:
-        if len(parts) >= 6:  # We need at least 6 parts for basic info
+        if len(parts) >= 6: 
             nom = parts[0]  # Instance name
             algo = parts[1]  # Method
             tps = float(parts[2])  # Time
-            length_c = int(float(parts[3]))  # Best length from C
+            length_c = float(parts[3])  # Best length from C
             # parts[4] is worst length - we don't need it
             tour_str = parts[5]  # Best tour string
             
@@ -80,14 +80,13 @@ def test_instance(filename,methods):
     # affiche la banière des résultats et appelle les programme C
     instance,coord,edge_type = load_instance(filename)
     distance_fct,graphique = select_fct(edge_type)
-
-    print("Longueur du tour canonique (tsplib95 built in) =",instance.trace_canonical_tour())
-    print("\n")
-
+    can_len = instance.trace_canonical_tour()
+    print("Longueur du tour canonique (tsplib95 built in) =",can_len)
     print("Instance ; algo ; long (C) ; long (Python) ; temps ; tour ; valid ; mêmes longueurs")
 
     for m in methods:
         extract_data(path,code,filename,m,distance_fct,coord,graphique)
+    print ("\n")
 
 def tests_instances_list(instances_file,methods):
     # lance le programme C avec toutes les options de methods
@@ -98,7 +97,6 @@ def tests_instances_list(instances_file,methods):
 
 # Liste de paramètres.
 # opt = tsplib95.load_solution(filename+'.opt.tour') pour charger un pyfichier solution dans python
-#filename = "burma14.tsp"
 filename = "example.tsp" # using a smaller instance for brute force
 path = "../" # adaptez à votre cas
 code = "tsp" # nom du programme C

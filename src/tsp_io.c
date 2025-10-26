@@ -8,6 +8,7 @@
 #include "../include/tsp_io.h"
 #include "../include/distance.h"
 #include "../include/distance_matrix.h"
+#include "../include/utils.h"
 
 #ifndef M_PI
 #define M_PI 3.14159265358979323846
@@ -30,28 +31,23 @@ int read_tsplib(const char *filename, TSPInstance *instance) {
     char line[256];
     while(fgets(line, sizeof(line), file)) {
         if (sscanf(line, "NAME : %s", instance->name) == 1) {
-            //printf("[INFO] Name : %s\n", instance->name);
-            continue;
+            DEBUG_PRINT("[INFO] Name : %s\n", instance->name);
         }
 
         else if (sscanf(line, "COMMENT : %[^\n]", instance->comment) == 1) {
-            //printf("[INFO] Comment : %s\n", instance->comment);
-            continue;
+            DEBUG_PRINT("[INFO] Comment : %s\n", instance->comment);
         }
 
         else if (sscanf(line, "TYPE : %s", instance->type) == 1) {
-            //printf("[INFO] Type : %s\n", instance->type);
-            continue;
+            DEBUG_PRINT("[INFO] Type : %s\n", instance->type);
         }        
         
         else if (sscanf(line, "DIMENSION : %d", &instance->dimension) == 1) {
-            //printf("[INFO] Dimension : %d\n", instance->dimension);
-            continue;
+            DEBUG_PRINT("[INFO] Dimension : %d\n", instance->dimension);
         }
 
         else if (sscanf(line, "EDGE_WEIGHT_TYPE : %s", instance->edge_weight_type) == 1) {
-            //printf("[INFO] Edge weight type : %s\n", instance->edge_weight_type);
-            continue;
+            DEBUG_PRINT("[INFO] Edge weight type : %s\n", instance->edge_weight_type);
         }
 
         else if (strncmp(line, "NODE_COORD_SECTION", 18) == 0) {
@@ -113,7 +109,7 @@ int read_node_coords(FILE *file, TSPInstance *instance){
         }
         instance->coords[i][0] = x;
         instance->coords[i][1] = y;
-        //printf("  %d -> (%lf, %lf)\n", id, x, y);
+        DEBUG_PRINT("  %d -> (%lf, %lf)\n", id, x, y);
     }
     return 0;
 }
