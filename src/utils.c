@@ -30,6 +30,13 @@ void usage(const char *p) {
     printf("  -f <file>    TSPLIB instance file\n");
     printf("  -c           Compute and print canonical tour\n");
     printf("  -m bf        Run brute-force search and print tour\n");
+
+    printf("\n");
+    printf(" -> Testing :\n");
+    printf("   Run the test script 'test_tsp_c.py' located in the /tests/ folder\n");
+    printf("   Look for the config in the script and choose between canonical mode (-c) or brute-force mode (-m bf)\n");
+    printf("   Add .tsp file names to instances.txt to test multiple instances in one go.\n");
+
 }
 
 /**
@@ -98,8 +105,11 @@ int canonical_mode(TSPGraph *graph, TSPInstance instance){
     printf("Instance ; Méthode ; Temps CPU (sec) ; Longueur ; Tour\n");
 
     printf("%s ; canonical ; %.2f ; %.2f ;", instance.name, secs, len);
-    print_tour(tour, n);
-    printf("\n");
+    printf("[1");
+    for (int i = 1; i < n; i++) {
+        printf(", %d", tour[i]+1);
+    }
+    printf("]\n");
     free(tour);
     return len;
 }
