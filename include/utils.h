@@ -1,11 +1,31 @@
-#include <stdio.h>
-#include <stdlib.h>
-
 #ifndef UTILS_H
 #define UTILS_H
 
+#include <stdio.h>
+#include <stdlib.h>
+#include "graph.h"
+#include "tsp_io.h"
+#include "brute_force.h"
+
+// -----------------------------------------------------------------------------
+// Debug macro
+// -----------------------------------------------------------------------------
+#ifdef DEBUG
+    #define DEBUG_PRINT(fmt, ...) \
+        fprintf(stderr, "[DEBUG] %s:%d:%s(): " fmt "\n", \
+                __FILE__, __LINE__, __func__, ##__VA_ARGS__)
+#else
+    #define DEBUG_PRINT(fmt, ...) ((void)0)
+#endif
+
+// -----------------------------------------------------------------------------
+// Function declarations
+// -----------------------------------------------------------------------------
 void usage(const char *p);
-int parse_args(int argc, char *argv[], const char **filename, int *do_canonical, int *do_bf);
+int parse_args(int argc, char *argv[], const char **filename, int *can, int *bf);
 int canonical_mode(TSPGraph *graph, TSPInstance instance);
+void print_final_results(BruteForceState *state);
 
 #endif /* UTILS_H */
+
+

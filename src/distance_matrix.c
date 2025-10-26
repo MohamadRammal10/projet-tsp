@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "../include/distance_matrix.h"
+#include "../include/utils.h"
 
 /**
  * @brief Build half distance matrix for optimization purposes.
@@ -41,7 +42,7 @@ HalfMatrix *build_half_distance_matrix(double **coords, int n, DistanceFunc dist
         }
     }
 
-    //printf("[DEBUG] Half-matrix built (%d nodes, %.0f entries)\n", n, n*(n-1)/2.0);
+    DEBUG_PRINT("Half-matrix built (%d nodes, %.0f entries)\n", n, n*(n-1)/2.0);
     return matrix;
 }
 

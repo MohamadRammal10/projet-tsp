@@ -5,32 +5,9 @@
 #include <time.h>
 #include <signal.h>
 
-#include "../include/brute_force.h"
+#include "../include/utils.h"
 #include "../include/tour.h"
-
-/* --- Structure de données pour l'état de l'algorithme --- */
-
-/**
- * @brief Contient toutes les données nécessaires à l'exécution 
- * de l'algorithme de force brute.
- */
-typedef struct {
-    TSPGraph *graph;
-    int n;           // Nombre total de nœuds
-    int size;        // Taille de la permutation (n - 1)
-
-    int *perm;       // Permutation courante [1, ..., n-1]
-    int *best;       // Meilleure permutation trouvée
-    int *worst;      // Pire permutation trouvée
-    int *tour;       // Tampon pour le tour complet [0, perm..., 0]
-
-    double best_len;
-    double worst_len;
-    unsigned long long iterations;
-    clock_t start_time;
-
-    const char *instance_name;
-} BruteForceState;
+#include "../include/brute_force.h"
 
 /* --- Variables globales pour la gestion du signal --- */
 
@@ -165,44 +142,6 @@ static BruteForceState *create_brute_force_state(TSPGraph *graph, const char *in
     return state;
 }
 
-
-/* --- Fonctions utilitaires d'impression --- */
-
-/**
- * @brief Affiche une tournée (permutation 1-basée) sur une seule ligne.
- * Ex: [1, 3, 2, 4]
- */
-static void print_tour_inline(const int *perm, int size) {
-    printf("[1");
-    for (int i = 0; i < size; i++) {
-        printf(", %d", perm[i] + 1);
-    }
-    printf("]");
-}
-
-/**
- * @brief Affiche les résultats finaux au format CSV normalisé.
- * TODO: Adapter la fonction pour tout type de méthode (ici seulement "bf") 
- */
-static void print_final_results(BruteForceState *state) {
-    double total_time = (double)(clock() - state->start_time) / CLOCKS_PER_SEC;
-
-    static int header_done = 0;
-    if (!header_done) {
-        printf("Instance ; Méthode ; Temps CPU (sec) ; Meilleure longueur ; Pire longueur ; Tour optimale ; Pire tournée\n");
-        header_done = 1;
-    }
-
-    // Affiche la ligne de résultat
-    printf("%s ; bf ; %.3f ; %.8f ; %.8f ; ", 
-           state->instance_name, total_time, state->best_len, state->worst_len);
-    
-    print_tour_inline(state->best, state->size);
-    printf(" ; ");
-    print_tour_inline(state->worst, state->size);
-    printf("\n");
-}
-
 /* --- Fonctions cœur de l'algorithme --- */
 
 /**
@@ -218,7 +157,7 @@ static void evaluate_current_permutation(BruteForceState *state) {
     state->tour[state->n] = 0;
 
     // Calculer le coût
-    double len = compute_tour_cost(state->graph, state->tour, state->n + 1);
+    double len = compute_tour_cost(state->graph, state->tour, state->n+1);
     state->iterations++;
 
     // Mettre à jour le meilleur
@@ -254,17 +193,17 @@ static int handle_interrupt(BruteForceState *state) {
 
     // Tournée courante (1-basée)
     printf("Tournée courante (1-based) : ");
-    print_tour_inline(state->perm, state->size);
+    print_tour(state->perm, state->size);
     printf("\n");
 
     // Meilleur trouvé
     printf("Meilleure longueur : %.8f | Meilleure tournée : ", state->best_len);
-    print_tour_inline(state->best, state->size);
+    print_tour(state->best, state->size);
     printf("\n");
 
     // Pire trouvé
     printf("Pire longueur : %.0f | Pire tournée : ", state->worst_len);
-    print_tour_inline(state->worst, state->size);
+    print_tour(state->worst, state->size);
     printf("\n");
 
     printf("Itérations : %llu | Temps CPU : %.3fs\n", state->iterations, elapsed);
@@ -288,6 +227,7 @@ static int handle_interrupt(BruteForceState *state) {
         return 0; // Continuer
     }
 }
+
 
 /* --- Fonction publique (Point d'entrée) --- */
 
