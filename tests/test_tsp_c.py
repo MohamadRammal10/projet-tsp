@@ -104,10 +104,10 @@ def tests_instances_list(instances_file,methods):
             test_instance(instance.strip(),methods)
 
 # === Configuration ===
-filename = "example.tsp"  # example instance
+filename = "instances.tsp"  # example instance
 path = "../"              # adapt as needed
 code = "tsp"              # name of C executable
-methods = ["bf"]          # ["-c"] for canonical mode OR ["bf"] for brute force
+methods = ["nn"]          # ["-c"] for canonical mode OR ["bf"] for brute force OR ["nn"] for nearest neighbor
 
 # Run tests
 tests_instances_list("./instances.txt", methods)

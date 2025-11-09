@@ -8,14 +8,17 @@
 #include "../include/tour.h"
 #include "../include/brute_force.h"
 #include "../include/utils.h"
+#include "../include/nearest_neighbor.h"
+
 
 int main(int argc, char *argv[]) {
     const char *filename = NULL;
     int can = 0;
     double can_len = 0.0;
     int bf = 0;
+    int nn = 0;
 
-    if (parse_args(argc, argv, &filename, &can, &bf) == -1){
+    if (parse_args(argc, argv, &filename, &can, &bf, &nn) == -1){
         return EXIT_FAILURE;
     }
 
@@ -35,13 +38,14 @@ int main(int argc, char *argv[]) {
             return EXIT_FAILURE;
         }
     }
-
-    /* Brute force solution */
     if (bf) {
         run_brute_force_graph(graph, instance.name);
     }
 
-    //TODO : Nearest neighbor algorithm
+
+        if (nn) {
+        run_nearest_neighbor(graph, instance.name);
+    }
 
     //TODO : Random walk algorithm
 
