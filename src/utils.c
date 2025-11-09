@@ -44,7 +44,7 @@ void usage(const char *p) {
  * @return -1 if an error occurs.
  * @return 0 on success.
  */
-int parse_args(int argc, char *argv[], const char **filename, int *can, int *bf){ 
+int parse_args(int argc, char *argv[], const char **filename, int *can, int *bf, int *nn){ 
     if((argc == 2 && !strcmp(argv[1], "-h")) || argc == 1 ) {
         usage(argv[0]);
         return EXIT_SUCCESS;
@@ -61,20 +61,21 @@ int parse_args(int argc, char *argv[], const char **filename, int *can, int *bf)
         } 
         else if (!strcmp(argv[i], "-c")) {
             *can = 1;
-        }
-        else if (!strcmp(argv[i], "-m") && i + 1 < argc) {
-            if (!strcmp(argv[i+1], "bf")) { 
+        } else if (!strcmp(argv[i], "-m") && i + 1 < argc) {
+            const char *m = argv[++i];
+            if (!strcmp(m, "bf")) {
                 *bf = 1;
-                i++;
-            } else { 
-                printf("Specify the algorithm after -m.\n");
+            } else if (!strcmp(m, "nn")) {
+                *nn = 1;
+            } else {
+                fprintf(stderr, "Unknown method '%s'\n", m);
                 usage(argv[0]);
                 return -1;
             }
-            //TODO: next modes : nn, rw, 2opt, ga
         } else {
             usage(argv[0]);
             return -1;
+
         }
     }
 
