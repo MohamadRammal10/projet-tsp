@@ -1,5 +1,5 @@
 - Adapter la fonction print_final_results dans brute_force.c
-à tout type de méthode (pour le moment seulement "bf")
+à tout type de méthode (pour le moment seulement "bf") [DONE]
 
 - Fix GEO.tsp reading file bug [DONE]
 
@@ -14,7 +14,7 @@
 
 - Fix CANONICAL METHOD!!!!!!!!!!!!!! [DONE]
 
-- Check the matrix
+- Check the matrix [DONE]
 
 - ADD PRINT TO JUST -f [DONE]
 
@@ -25,6 +25,14 @@
 
 - Compare canonical form in python script [DONE]
 
-- Clean python script code @fourat
+- Clean python script code [DONE]
 
 - Do requirement checklist [DONE]
+
+------ [TODO]
+
+- Nearest Neighbor [DONE] 11/11/25
+
+- RANDOM WALK
+
+- 2OPT

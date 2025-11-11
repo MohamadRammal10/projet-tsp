@@ -119,7 +119,14 @@ int canonical_mode(TSPGraph *graph, TSPInstance instance){
 /**
  * @brief Affiche les résultats finaux au format CSV normalisé.
  */
-void print_final_results(BruteForceState *state) {
+void print_final_results(char *method, double temps_cpu, double longueur, int *permutation, int n) {
+    printf("Instance ; Methode ; Temps CPU (sec) ; Longueur ; Tour\n");
+    printf("%s ; nn ; %.3f ; %.12f ; ", method, temps_cpu, longueur);
+    print_tour(permutation, n - 1);  // Tour
+    printf("\n");
+}
+
+void print_bf_results(BruteForceState *state) {
     double total_time = (double)(clock() - state->start_time) / CLOCKS_PER_SEC;
     printf("Instance ; Methode ; Temps CPU (sec) ; Meilleure longueur ; Pire longueur ; Tour optimale ; Pire tournée\n");
 
@@ -131,4 +138,3 @@ void print_final_results(BruteForceState *state) {
     print_tour(state->worst, state->size);
     printf("\n");
 }
-

@@ -267,7 +267,7 @@ void run_brute_force_graph(TSPGraph *graph, const char *instance_name) {
     }
 
     if (finished) {
-        print_final_results(state);
+        print_bf_results(state);
     }
 
     free_brute_force_state(state);

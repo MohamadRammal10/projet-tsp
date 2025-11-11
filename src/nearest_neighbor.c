@@ -123,10 +123,7 @@ void run_nearest_neighbor(TSPGraph *graph, const char *instance_name) {
     double temps_cpu = (double)(clock() - debut) / CLOCKS_PER_SEC;
 
     // Étape 4 : affichage standardisé
-    printf("Instance ; Methode ; Temps CPU (sec) ; Longueur ; Tour\n");
-    printf("%s ; nn ; %.3f ; %.12f ; ", instance_name, temps_cpu, longueur);
-    print_tour(permutation, n - 1);  // Tour
-    printf("\n");
+    print_final_results((char *)instance_name, temps_cpu, longueur, permutation, n);
 
     liberer_tableaux_nn(permutation, tour_complet);
 }
