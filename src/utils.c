@@ -28,15 +28,16 @@ void usage(const char *p) {
     printf("-> Options :\n");
     printf("  -h           Show this help message.\n");
     printf("  -f <file>    TSPLIB instance file\n");
-    printf("  -c           Compute and print canonical tour\n");
-    printf("  -m bf        Run brute-force search and print tour\n");
+    printf("  -c           Run canonical search\n");
+    printf("  -m bf        Run brute-force search\n");
+    printf("  -m nn        Run nearest-neighbor search\n");
 
     printf("\n");
-    printf(" -> Testing :\n");
-    printf("   Run the test script 'test_tsp_c.py' located in the /tests/ folder\n");
-    printf("   Look for the config in the script and choose between canonical mode (-c) or brute-force mode (-m bf)\n");
-    printf("   Add .tsp file names to instances.txt to test multiple instances in one go.\n");
-
+    printf(" -> Testing config :\n");
+    printf("   Usage: python3 test_tsp_c.py\n");
+    printf("   -c          Test canonical mode\n");
+    printf("   bf          Test brute force mode\n");
+    printf("   nn          Test nearest neighbor mode\n");
 }
 
 /**
@@ -117,13 +118,18 @@ int canonical_mode(TSPGraph *graph, TSPInstance instance){
 
 /**
  * @brief Affiche les résultats finaux au format CSV normalisé.
- * TODO: Adapter la fonction pour tout type de méthode (ici seulement "bf") 
  */
-void print_final_results(BruteForceState *state) {
+void print_final_results(char *method, double temps_cpu, double longueur, int *permutation, int n) {
+    printf("Instance ; Methode ; Temps CPU (sec) ; Longueur ; Tour\n");
+    printf("%s ; nn ; %.3f ; %.12f ; ", method, temps_cpu, longueur);
+    print_tour(permutation, n - 1);  // Tour
+    printf("\n");
+}
+
+void print_bf_results(BruteForceState *state) {
     double total_time = (double)(clock() - state->start_time) / CLOCKS_PER_SEC;
     printf("Instance ; Methode ; Temps CPU (sec) ; Meilleure longueur ; Pire longueur ; Tour optimale ; Pire tournée\n");
 
-    // TODO: ADAPT TO ALL METHODS "bf"
     printf("%s ; bf ; %.3f ; %.12f ; %.12f ; ", 
            state->instance_name, total_time, state->best_len, state->worst_len);
     
