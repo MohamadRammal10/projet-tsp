@@ -30,7 +30,24 @@ def extract_data(path, code, filename, method, distance_fct, coord, graphique, c
     parts = [part.strip() for part in data_line.split(';')]
 
     try:
-        if method == "-c" and len(parts) == 5:
+        if len(parts) >= 6 and method == "bf":
+            # Format: Instance ; algo ; Time ; Length_C ; Length_Python ; [Tour]
+            nom = parts[0]
+            algo = parts[1]
+            tps = float(parts[2])
+            len_c = float(parts[3])
+            tour_str = parts[5]
+
+            tour_str_clean = tour_str.strip('[]')
+            tour = [int(x.strip()) for x in tour_str_clean.split(',')]
+
+            v = valid(tour)
+            len_py = fitness(tour, distance_fct, coord)
+
+            print(f"{nom} ; {algo} ; {len_c:.2f} ; {len_py:.2f} ; {tps:.2f} ; {tour} ; {v == 0} ; {abs(len_c - len_py) < 1e-6}")
+            graphique(tour, algo, coord)
+
+        elif len(parts) == 5:
             # Format: Instance ; canonical ; Time ; Length ; [Tour]
             nom = parts[0]
             algo = parts[1]
@@ -48,23 +65,6 @@ def extract_data(path, code, filename, method, distance_fct, coord, graphique, c
             print(f"{nom} ; {algo} ; {tps:.2f} ; {len_c:.2f} ; {len_py:.2f} ; {tour} ; {round(int(len_py)) == round(int(len_c))}")
             graphique(tour, algo, coord)
 
-        elif len(parts) >= 6:
-            # Non-canonical (brute force etc.)
-            nom = parts[0]
-            algo = parts[1]
-            tps = float(parts[2])
-            len_c = float(parts[3])
-            tour_str = parts[5]
-
-            tour_str_clean = tour_str.strip('[]')
-            tour = [int(x.strip()) for x in tour_str_clean.split(',')]
-
-            v = valid(tour)
-            len_py = fitness(tour, distance_fct, coord)
-
-            print(f"{nom} ; {algo} ; {len_c:.2f} ; {len_py:.2f} ; {tps:.2f} ; {tour} ; {v == 0} ; {abs(len_c - len_py) < 1e-6}")
-            graphique(tour, algo, coord)
-
         else:
             print(f"Erreur: Format de sortie incorrect. Parts: {parts}")
 
@@ -80,18 +80,17 @@ def load_instance(filename):
     edge_type = instance_dict['edge_weight_type']
     return instance,coord,edge_type
 
-def test_instance(filename,methods):
+def test_instance(filename, methods):
     """Run tests for one TSP instance and list of methods."""
     instance, coord, edge_type = load_instance(filename)
     distance_fct, graphique = select_fct(edge_type)
     canonical_len = instance.trace_canonical_tour()
 
-    if methods == ["-c"]:
-        print("=== Test Canonique ===")
-        print("Instance ; algo ; temps CPU (sec) ; long (C) ; long (Python) ; Tour ; mêmes longueurs")
-    else:
-        print(f"=== Test {methods[0]} === ")
+    print(f"=== Test {methods[0]} ===")
+    if methods == ["bf"]:
         print("Instance ; algo ; long (C) ; long (Python) ; temps ; tour ; valid ; mêmes longueurs")
+    else:
+        print("Instance ; algo ; temps CPU (sec) ; long (C) ; long (Python) ; Tour ; mêmes longueurs")
 
     for m in methods:
         extract_data(path, code, filename, m, distance_fct, coord, graphique, canonical_len)
@@ -107,7 +106,7 @@ def tests_instances_list(instances_file,methods):
 filename = "instances.tsp"  # example instance
 path = "../"              # adapt as needed
 code = "tsp"              # name of C executable
-methods = ["nn"]          # ["-c"] for canonical mode OR ["bf"] for brute force OR ["nn"] for nearest neighbor
+methods = ["-c"]          # ["-c"] for canonical mode OR ["bf"] for brute force OR ["nn"] for nearest neighbor
 
 # Run tests
 tests_instances_list("./instances.txt", methods)

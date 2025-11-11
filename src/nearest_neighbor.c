@@ -81,8 +81,7 @@ static void construire_permutation_nn(TSPGraph *graph, int *permutation_sortie) 
  * @param permutation   Tableau contenant la permutation.
  * @param tour_complet  Tableau contenant la tournée complète.
  */
-static void liberer_tableaux_nn(int *permutation, int *tour_complet)
-{
+static void liberer_tableaux_nn(int *permutation, int *tour_complet) {
     if (permutation)
         free(permutation);
     if (tour_complet)
@@ -101,6 +100,7 @@ void run_nearest_neighbor(TSPGraph *graph, const char *instance_name) {
     int n = graph->num_nodes;
     int *permutation = malloc((n - 1) * sizeof(int));
     int *tour_complet = malloc((n + 1) * sizeof(int));
+
     if (!permutation || !tour_complet) {
         perror("Erreur d'allocation pour nearest neighbor");
         liberer_tableaux_nn(permutation, tour_complet);
@@ -108,22 +108,24 @@ void run_nearest_neighbor(TSPGraph *graph, const char *instance_name) {
     }
 
     clock_t debut = clock();
+
     // Étape 1 : construire la permutation
     construire_permutation_nn(graph, permutation);
+
     // Étape 2 : créer la tournée complète [0, perm..., 0]
     tour_complet[0] = 0;
     for (int i = 0; i < n - 1; ++i)
         tour_complet[i + 1] = permutation[i];
     tour_complet[n] = 0;
+
     // Étape 3 : calculer la longueur et le temps d’exécution
     double longueur = compute_tour_cost(graph, tour_complet, n + 1);
     double temps_cpu = (double)(clock() - debut) / CLOCKS_PER_SEC;
+
     // Étape 4 : affichage standardisé
-    printf("Instance ; Methode ; Temps CPU (sec) ; Meilleure longueur ; Pire longueur ; Tour optimale ; Pire tournée\n");
-    printf("%s ; nn ; %.3f ; %.12f ; %.12f ; ", instance_name, temps_cpu, longueur, longueur);
-    print_tour(permutation, n - 1);  // Tour optimale
-    printf(" ; ");
-    print_tour(permutation, n - 1);  // Pire tournée 
+    printf("Instance ; Methode ; Temps CPU (sec) ; Longueur ; Tour\n");
+    printf("%s ; nn ; %.3f ; %.12f ; ", instance_name, temps_cpu, longueur);
+    print_tour(permutation, n - 1);  // Tour
     printf("\n");
 
     liberer_tableaux_nn(permutation, tour_complet);

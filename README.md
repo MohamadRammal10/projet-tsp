@@ -91,8 +91,3 @@ git push origin --delete mohamad-rw
   ```
 
 ---
-
-📌 **Règle d’or** :  
-👉 On ne code pas directement sur `main`.  
-👉 Chaque fonctionnalité = une branche + une Pull Request.  
-👉 `main` doit toujours compiler et être stable.
