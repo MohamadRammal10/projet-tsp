@@ -1,9 +1,11 @@
 import random,math
 import subprocess
 import time
+import sys
 import tsplib95 
 import pyproj
 import matplotlib.pyplot as plt
+
 from tsp_tools import *
 
 def extract_data(path, code, filename, method, distance_fct, coord, graphique, can_len=None):
@@ -48,7 +50,7 @@ def extract_data(path, code, filename, method, distance_fct, coord, graphique, c
             graphique(tour, algo, coord)
 
         elif len(parts) == 5:
-            # Format: Instance ; canonical ; Time ; Length ; [Tour]
+            # Format: Instance ; algo ; Time ; Length ; [Tour]
             nom = parts[0]
             algo = parts[1]
             tps = float(parts[2])
@@ -102,11 +104,30 @@ def tests_instances_list(instances_file,methods):
         for instance in file:
             test_instance(instance.strip(),methods)
 
-# === Configuration ===
-filename = "instances.tsp"  # example instance
-path = "../"              # adapt as needed
-code = "tsp"              # name of C executable
-methods = ["-c"]          # ["-c"] for canonical mode OR ["bf"] for brute force OR ["nn"] for nearest neighbor
+if __name__ == "__main__":
+    # === CLI argument handling ===
+    if len(sys.argv) != 2:
+        print("Usage: python3 run_tsp.py <method>")
+        print("Available methods:")
+        print("   -c       Canonical tour")
+        print("   bf       Brute-force")
+        print("   nn       Nearest Neighbor")
+        print("   rw       Random walk")
+        sys.exit(1)
 
-# Run tests
-tests_instances_list("./instances.txt", methods)
+    method = sys.argv[1]
+
+    valid_methods = ["-c", "bf", "nn", "rw"]
+    if method not in valid_methods:
+        print(f"Erreur: méthode '{method}' invalide.")
+        print("Méthodes valides : -c, bf, nn, rw")
+        sys.exit(1)
+
+    # === Configuration ===
+    filename = "instances.tsp"   # example instance
+    path = "../"                 # adapt as needed
+    code = "tsp"                 # C executable name
+    methods = [method]           # method chosen from CLI
+
+    # Run tests
+    tests_instances_list("./instances.txt", methods)
