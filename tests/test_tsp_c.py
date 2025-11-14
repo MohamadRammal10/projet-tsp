@@ -61,10 +61,11 @@ def extract_data(path, code, filename, method, distance_fct, coord, graphique, c
             tour_str_clean = tour_str.strip('[]')
             tour = [int(x.strip()) for x in tour_str_clean.split(',')]
 
+            v = valid(tour)
             # Compute canonical length in Python
             len_py = fitness(tour, distance_fct, coord)
 
-            print(f"{nom} ; {algo} ; {tps:.2f} ; {len_c:.2f} ; {len_py:.2f} ; {tour} ; {round(int(len_py)) == round(int(len_c))}")
+            print(f"{nom} ; {algo} ; {tps:.2f} ; {len_c:.2f} ; {len_py:.2f} ; {tour} ; {v == 0} ; {round(int(len_py)) == round(int(len_c))}")
             graphique(tour, algo, coord)
 
         else:
@@ -92,7 +93,7 @@ def test_instance(filename, methods):
     if methods == ["bf"]:
         print("Instance ; algo ; long (C) ; long (Python) ; temps ; tour ; valid ; mêmes longueurs")
     else:
-        print("Instance ; algo ; temps CPU (sec) ; long (C) ; long (Python) ; Tour ; mêmes longueurs")
+        print("Instance ; algo ; temps CPU (sec) ; long (C) ; long (Python) ; Tour ; valid ; mêmes longueurs")
 
     for m in methods:
         extract_data(path, code, filename, m, distance_fct, coord, graphique, canonical_len)
