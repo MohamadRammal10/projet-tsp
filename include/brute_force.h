@@ -2,6 +2,7 @@
 #define BRUTE_FORCE_H
 
 #include "graph.h"
+#include <time.h>
 
 /* --- Structure de données pour l'état de l'algorithme --- */
 
