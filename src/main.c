@@ -9,6 +9,7 @@
 #include "../include/brute_force.h"
 #include "../include/utils.h"
 #include "../include/nearest_neighbor.h"
+#include "../include/random_walk.h"
 
 
 int main(int argc, char *argv[]) {
@@ -17,8 +18,9 @@ int main(int argc, char *argv[]) {
     double can_len = 0.0;
     int bf = 0;
     int nn = 0;
+    int rw = 0;
 
-    if (parse_args(argc, argv, &filename, &can, &bf, &nn) == -1){
+    if (parse_args(argc, argv, &filename, &can, &bf, &nn, &rw) == -1){
         return EXIT_FAILURE;
     }
 
@@ -47,7 +49,8 @@ int main(int argc, char *argv[]) {
         run_nearest_neighbor(graph, instance.name);
     }
 
-    //TODO : Random walk algorithm
+    // Méthode Random Walk
+    if (rw) run_random_walk(graph, instance.name);
 
     //TODO : 2-opt algorithm
 

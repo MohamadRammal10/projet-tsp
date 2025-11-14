@@ -31,6 +31,7 @@ void usage(const char *p) {
     printf("  -c           Run canonical search\n");
     printf("  -m bf        Run brute-force search\n");
     printf("  -m nn        Run nearest-neighbor search\n");
+    printf("  -m rw        Run random walk search\n");
 
     printf("\n");
     printf(" -> Testing config :\n");
@@ -38,6 +39,7 @@ void usage(const char *p) {
     printf("   -c          Test canonical mode\n");
     printf("   bf          Test brute force mode\n");
     printf("   nn          Test nearest neighbor mode\n");
+    printf("   rw          Test random walk mode\n");
 }
 
 /**
@@ -45,7 +47,7 @@ void usage(const char *p) {
  * @return -1 if an error occurs.
  * @return 0 on success.
  */
-int parse_args(int argc, char *argv[], const char **filename, int *can, int *bf, int *nn){ 
+int parse_args(int argc, char *argv[], const char **filename, int *can, int *bf, int *nn, int *rw){ 
     if((argc == 2 && !strcmp(argv[1], "-h")) || argc == 1 ) {
         usage(argv[0]);
         return EXIT_SUCCESS;
@@ -68,6 +70,8 @@ int parse_args(int argc, char *argv[], const char **filename, int *can, int *bf,
                 *bf = 1;
             } else if (!strcmp(m, "nn")) {
                 *nn = 1;
+            } else if (!strcmp(m, "rw")) {
+                *rw = 1;
             } else {
                 fprintf(stderr, "Unknown method '%s'\n", m);
                 usage(argv[0]);

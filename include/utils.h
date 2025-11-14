@@ -22,9 +22,10 @@
 // Function declarations
 // -----------------------------------------------------------------------------
 void usage(const char *p);
-int parse_args(int argc, char *argv[], const char **filename, int *can, int *bf, int *nn);
+int parse_args(int argc, char *argv[], const char **filename, int *can, int *bf, int *nn, int *rw);
 int canonical_mode(TSPGraph *graph, TSPInstance instance);
-void print_final_results(BruteForceState *state);
+void print_final_results(char *method, double temps_cpu, double longueur, int *permutation, int n);
+void print_bf_results(BruteForceState *state);
 
 #endif /* UTILS_H */
 
