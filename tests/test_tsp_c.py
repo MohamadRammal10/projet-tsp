@@ -119,10 +119,10 @@ if __name__ == "__main__":
 
     method = sys.argv[1]
 
-    valid_methods = ["-c", "bf", "nn", "rw", "ga"]
+    valid_methods = ["-c", "bf", "nn", "rw", "ga", "2optnn", "2optrw"]
     if method not in valid_methods:
         print(f"Erreur: méthode '{method}' invalide.")
-        print("Méthodes valides : -c, bf, nn, rw, ga")
+        print("Méthodes valides : -c, bf, nn, rw, ga, 2optnn, 2optrw")
         sys.exit(1)
 
     # === Configuration ===
