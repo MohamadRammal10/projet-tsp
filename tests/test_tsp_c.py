@@ -108,6 +108,7 @@ def tests_instances_list(instances_file,methods):
 if __name__ == "__main__":
     # === CLI argument handling ===
     if len(sys.argv) != 2:
+        print("Add test files in ./instances.txt")
         print("Usage: python3 run_tsp.py <method>")
         print("Available methods:")
         print("   -c       Canonical tour")
@@ -126,8 +127,7 @@ if __name__ == "__main__":
         sys.exit(1)
 
     # === Configuration ===
-    filename = "instances.tsp"   # example instance
-    path = "../"                 # adapt as needed
+    path = "../"                 # Path to C executable tsp
     code = "tsp"                 # C executable name
     methods = [method]           # method chosen from CLI
 

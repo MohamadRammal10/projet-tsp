@@ -44,6 +44,8 @@ void usage(const char *p) {
     printf("   rw          Test random walk mode\n");
     printf("   2optnn      Test 2-opt nearest-neighbor mode\n");
     printf("   2optrw      Test 2-opt random walk mode\n");
+    printf("   ga          Test genetic algorithm mode\n");
+    
 }
 
 /**
