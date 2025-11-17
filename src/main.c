@@ -10,6 +10,7 @@
 #include "../include/utils.h"
 #include "../include/nearest_neighbor.h"
 #include "../include/random_walk.h"
+#include "../include/two_opt.h"
 
 
 int main(int argc, char *argv[]) {
@@ -19,8 +20,10 @@ int main(int argc, char *argv[]) {
     int bf = 0;
     int nn = 0;
     int rw = 0;
+    int twooptnn = 0;
+    int twooptrw = 0;
 
-    if (parse_args(argc, argv, &filename, &can, &bf, &nn, &rw) == -1){
+    if (parse_args(argc, argv, &filename, &can, &bf, &nn, &rw, &twooptnn, &twooptrw) == -1){
         return EXIT_FAILURE;
     }
 
@@ -52,7 +55,11 @@ int main(int argc, char *argv[]) {
     // Méthode Random Walk
     if (rw) run_random_walk(graph, instance.name);
 
-    //TODO : 2-opt algorithm
+    // Méthode 2-opt Nearest Neighbor
+    if (twooptnn) run_two_opt_nearest_neighbor(graph, instance.name);
+
+    // Méthode 2-opt Random Walk
+    if (twooptrw) run_two_opt_random_walk(graph, instance.name);
 
     //TODO : Genetic algorithm
 
