@@ -32,6 +32,8 @@ void usage(const char *p) {
     printf("  -m bf        Run brute-force search\n");
     printf("  -m nn        Run nearest-neighbor search\n");
     printf("  -m rw        Run random walk search\n");
+    printf("  -m 2optnn    Run 2-opt nearest-neighbor search\n");
+    printf("  -m 2optrw    Run 2-opt random walk search\n");
 
     printf("\n");
     printf(" -> Testing config :\n");
@@ -40,6 +42,8 @@ void usage(const char *p) {
     printf("   bf          Test brute force mode\n");
     printf("   nn          Test nearest neighbor mode\n");
     printf("   rw          Test random walk mode\n");
+    printf("   2optnn      Test 2-opt nearest-neighbor mode\n");
+    printf("   2optrw      Test 2-opt random walk mode\n");
 }
 
 /**
@@ -47,7 +51,7 @@ void usage(const char *p) {
  * @return -1 if an error occurs.
  * @return 0 on success.
  */
-int parse_args(int argc, char *argv[], const char **filename, int *can, int *bf, int *nn, int *rw, int *ga){ 
+int parse_args(int argc, char *argv[], const char **filename, int *can, int *bf, int *nn, int *rw, int *twooptnn, int *twooptrw, int *ga){ 
     if((argc == 2 && !strcmp(argv[1], "-h")) || argc == 1 ) {
         usage(argv[0]);
         return EXIT_SUCCESS;
@@ -74,6 +78,10 @@ int parse_args(int argc, char *argv[], const char **filename, int *can, int *bf,
                 *rw = 1;
             } else if (!strcmp(m, "ga")) {
                 *ga = 1;
+            } else if (!strcmp(m, "2optnn")) {
+                *twooptnn = 1;   
+            } else if (!strcmp(m, "2optrw")) {
+                *twooptrw = 1;
             } else {
                 fprintf(stderr, "Unknown method '%s'\n", m);
                 usage(argv[0]);
