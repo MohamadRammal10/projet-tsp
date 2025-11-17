@@ -114,14 +114,15 @@ if __name__ == "__main__":
         print("   bf       Brute-force")
         print("   nn       Nearest Neighbor")
         print("   rw       Random walk")
+        print("   ga       Genetic Algorithm")
         sys.exit(1)
 
     method = sys.argv[1]
 
-    valid_methods = ["-c", "bf", "nn", "rw"]
+    valid_methods = ["-c", "bf", "nn", "rw", "ga"]
     if method not in valid_methods:
         print(f"Erreur: méthode '{method}' invalide.")
-        print("Méthodes valides : -c, bf, nn, rw")
+        print("Méthodes valides : -c, bf, nn, rw, ga")
         sys.exit(1)
 
     # === Configuration ===

@@ -10,7 +10,7 @@
 #include "../include/utils.h"
 #include "../include/nearest_neighbor.h"
 #include "../include/random_walk.h"
-
+#include "../include/genetic.h"
 
 int main(int argc, char *argv[]) {
     const char *filename = NULL;
@@ -19,8 +19,9 @@ int main(int argc, char *argv[]) {
     int bf = 0;
     int nn = 0;
     int rw = 0;
+    int ga = 0;
 
-    if (parse_args(argc, argv, &filename, &can, &bf, &nn, &rw) == -1){
+    if (parse_args(argc, argv, &filename, &can, &bf, &nn, &rw, &ga) == -1){
         return EXIT_FAILURE;
     }
 
@@ -32,7 +33,7 @@ int main(int argc, char *argv[]) {
     TSPGraph *graph = create_graph(&instance);
     if (!graph) { free_half_matrix(instance.half_matrix); return EXIT_FAILURE; }
 
-    /* canonical mode: compute canonical tour */
+    // Méthode Canonical
     if (can) {
         if((can_len = canonical_mode(graph, instance)) == -1) {
             free_graph(graph);
@@ -40,21 +41,29 @@ int main(int argc, char *argv[]) {
             return EXIT_FAILURE;
         }
     }
+
+    // Méthode Brute Force
     if (bf) {
         run_brute_force_graph(graph, instance.name);
     }
 
-
-        if (nn) {
+    // Méthode Nearest Neighbor
+    if (nn) {
         run_nearest_neighbor(graph, instance.name);
     }
 
     // Méthode Random Walk
-    if (rw) run_random_walk(graph, instance.name);
+    if (rw) {
+        run_random_walk(graph, instance.name);
+    }
 
     //TODO : 2-opt algorithm
 
-    //TODO : Genetic algorithm
+    // Genetic algorithm
+    if (ga) {
+        run_genetic_algorithm(graph, instance.name);
+    }
+    
 
     free_graph(graph);
     free_half_matrix(instance.half_matrix);

@@ -40,11 +40,11 @@ void run_random_walk(TSPGraph *graph, const char *instance_name) {
     double total = compute_tour_cost(graph, tour, n);
 
     // Affichage du résultat
-    fprintf(stdout, "Instance ; Méthode ; Temps CPU (sec) ; longeur ; Tour\n");
+    fprintf(stdout, "Instance ; Méthode ; Temps CPU (sec) ; Longueur ; Tour\n");
     fprintf(stdout, "%s ; rw ; %.2f ; %.2f ; [", instance_name, temps_cpu, total);
     for (int i = 0; i < n; i++) {
         fprintf(stdout, "%d", tour[i] + 1);
-        if (i < n - 1) fprintf(stdout, ",");
+        if (i < n - 1) fprintf(stdout, ", ");
     }
     fprintf(stdout, "]\n");
 
