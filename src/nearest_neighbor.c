@@ -126,4 +126,34 @@ void run_nearest_neighbor(TSPGraph *graph, const char *instance_name) {
     print_final_results((char *)instance_name, temps_cpu, longueur, permutation, n);
 
     liberer_tableaux_nn(permutation, tour_complet);
+    return;
+}
+
+/**
+ * @brief Exécute l'algorithme du plus proche voisin pour 2-opt.
+ * 
+ * @param graph Graphe du TSP.
+ * @param instance_name Nom de l’instance (pour affichage).
+ */
+int *calculate_2opt(TSPGraph *graph, const char *instance_name){
+    if (!graph || graph->num_nodes <= 1) return;
+
+    int n = graph->num_nodes;
+    int *permutation = malloc((n - 1) * sizeof(int));
+    int *tour_complet = malloc((n + 1) * sizeof(int));
+
+    if (!permutation || !tour_complet) {
+        perror("Erreur d'allocation pour nearest neighbor");
+        liberer_tableaux_nn(permutation, tour_complet);
+        return;
+    }
+
+    construire_permutation_nn(graph, permutation);
+
+    tour_complet[0] = 0;
+    for (int i = 0; i < n - 1; ++i)
+        tour_complet[i + 1] = permutation[i];
+    tour_complet[n] = 0;
+
+    return tour_complet;
 }
