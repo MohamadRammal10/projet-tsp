@@ -51,7 +51,7 @@ void usage(const char *p) {
  * @return -1 if an error occurs.
  * @return 0 on success.
  */
-int parse_args(int argc, char *argv[], const char **filename, int *can, int *bf, int *nn, int *rw, int *twooptnn, int *twooptrw){ 
+int parse_args(int argc, char *argv[], const char **filename, int *can, int *bf, int *nn, int *rw, int *twooptnn, int *twooptrw, int *ga){ 
     if((argc == 2 && !strcmp(argv[1], "-h")) || argc == 1 ) {
         usage(argv[0]);
         return EXIT_SUCCESS;
@@ -76,6 +76,8 @@ int parse_args(int argc, char *argv[], const char **filename, int *can, int *bf,
                 *nn = 1;
             } else if (!strcmp(m, "rw")) {
                 *rw = 1;
+            } else if (!strcmp(m, "ga")) {
+                *ga = 1;
             } else if (!strcmp(m, "2optnn")) {
                 *twooptnn = 1;   
             } else if (!strcmp(m, "2optrw")) {
@@ -88,10 +90,8 @@ int parse_args(int argc, char *argv[], const char **filename, int *can, int *bf,
         } else {
             usage(argv[0]);
             return -1;
-
         }
     }
-
     return 0;
 }
 

@@ -83,11 +83,11 @@ void run_two_opt_random_walk(TSPGraph *graph, const char *instance_name) {
 
     // ----- AFFICHAGE -----
     printf("Instance ; Méthode ; Temps CPU (sec) ; longueur ; Tour\n");
-    printf("%s ; 2optrw ; %.3f ; %.12f ;\n[", instance_name, temps_cpu, new_cost);
+    printf("%s ; 2optrw ; %.3f ; %.12f ; [", instance_name, temps_cpu, new_cost);
 
     for (int i = 0; i < n; i++) {
         printf("%d", tour[i] + 1);
-        if (i < n - 1) printf(",");
+        if (i < n - 1) printf(", ");
     }
     printf("]\n");
 
@@ -137,11 +137,11 @@ void run_two_opt_nearest_neighbor(TSPGraph *graph, const char *instance_name) {
 
     // ----- AFFICHAGE -----
     printf("Instance ; Méthode ; Temps CPU (sec) ; longueur ; Tour\n");
-    printf("%s ; 2optnn ; %.3f ; %.12f ;\n[", instance_name, temps_cpu, new_cost);
+    printf("%s ; 2optnn ; %.3f ; %.12f ; [", instance_name, temps_cpu, new_cost);
 
     for (int i = 0; i < n; i++) {
         printf("%d", tour[i] + 1);
-        if (i < n - 1) printf(",");
+        if (i < n - 1) printf(", ");
     }
 
     printf("]\n");
