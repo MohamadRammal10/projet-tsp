@@ -42,9 +42,10 @@ double compute_tour_cost(TSPGraph *graph, int *tour, int n) {
  * @param n number of cities.
  */
 void print_tour(int *tour, int n) {
-    printf("[1");
+    printf("[");
     for (int i = 0; i < n; i++) {
-        printf(", %d", tour[i]+1);
+        printf("%d", tour[i] + 1);
+        if (i < n - 1) printf(", ");
     }
     printf("]");
 }
