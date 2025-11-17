@@ -123,7 +123,7 @@ void run_nearest_neighbor(TSPGraph *graph, const char *instance_name) {
     double temps_cpu = (double)(clock() - debut) / CLOCKS_PER_SEC;
 
     // Étape 4 : affichage standardisé
-    print_final_results((char *)instance_name, temps_cpu, longueur, permutation, n);
+    print_final_results((char *)instance_name, "nn", temps_cpu, longueur, permutation, n);
 
     liberer_tableaux_nn(permutation, tour_complet);
     return;
@@ -135,8 +135,8 @@ void run_nearest_neighbor(TSPGraph *graph, const char *instance_name) {
  * @param graph Graphe du TSP.
  * @param instance_name Nom de l’instance (pour affichage).
  */
-int *calculate_2opt(TSPGraph *graph, const char *instance_name){
-    if (!graph || graph->num_nodes <= 1) return;
+int *calculate_2opt_nn(TSPGraph *graph){
+    if (!graph || graph->num_nodes <= 1) return NULL;
 
     int n = graph->num_nodes;
     int *permutation = malloc((n - 1) * sizeof(int));
@@ -145,7 +145,7 @@ int *calculate_2opt(TSPGraph *graph, const char *instance_name){
     if (!permutation || !tour_complet) {
         perror("Erreur d'allocation pour nearest neighbor");
         liberer_tableaux_nn(permutation, tour_complet);
-        return;
+        return NULL;
     }
 
     construire_permutation_nn(graph, permutation);
@@ -154,6 +154,8 @@ int *calculate_2opt(TSPGraph *graph, const char *instance_name){
     for (int i = 0; i < n - 1; ++i)
         tour_complet[i + 1] = permutation[i];
     tour_complet[n] = 0;
+
+    free(permutation);
 
     return tour_complet;
 }

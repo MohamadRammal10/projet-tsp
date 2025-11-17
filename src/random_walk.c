@@ -1,23 +1,22 @@
 #include "../include/random_walk.h"
 #include "../include/distance_matrix.h"
 #include "../include/tour.h"
+#include "../include/utils.h"
 #include <time.h>
 
-void run_random_walk(TSPGraph *graph, const char *instance_name) {
+int *random_walk_optimize(TSPGraph *graph) {
 
     if (!graph || graph->num_nodes <= 1) {
         fprintf(stderr, "Graphe invalide !\n");
-        return;
+        return NULL;
     }
 
     int n = graph->num_nodes;
     int *tour = malloc(n * sizeof(int));
     if (!tour) {
         fprintf(stderr, "Erreur de l'allocation du tour\n");
-        return;
+        return NULL;
     }
-
-    clock_t debut = clock();
 
     // Créer une tournée canonique
     for (int i = 0; i < n; i++) tour[i] = i;
@@ -33,20 +32,22 @@ void run_random_walk(TSPGraph *graph, const char *instance_name) {
         tour[j] = tmp;
     }
 
-    // Calcul du temps d'exécution
+    return tour;
+}
+
+void run_random_walk(TSPGraph *graph, const char *instance_name) {
+
+    int n = graph->num_nodes;
+
+    clock_t debut = clock();
+    int *tour = random_walk_optimize(graph);
     double temps_cpu = (double) (clock() - debut) / CLOCKS_PER_SEC; 
 
     // Calcul de la distance
     double total = compute_tour_cost(graph, tour, n);
 
-    // Affichage du résultat
-    fprintf(stdout, "Instance ; Méthode ; Temps CPU (sec) ; Longueur ; Tour\n");
-    fprintf(stdout, "%s ; rw ; %.2f ; %.2f ; [", instance_name, temps_cpu, total);
-    for (int i = 0; i < n; i++) {
-        fprintf(stdout, "%d", tour[i] + 1);
-        if (i < n - 1) fprintf(stdout, ", ");
-    }
-    fprintf(stdout, "]\n");
+    print_final_results((char *)instance_name, "rw", temps_cpu, total, tour, n);
 
     free(tour);
+
 }
