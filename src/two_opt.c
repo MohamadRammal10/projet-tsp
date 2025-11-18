@@ -1,5 +1,6 @@
 #include "../include/two_opt.h"
 #include "../include/distance_matrix.h"
+#include "../include/nearest_neighbor.h"
 #include <stdlib.h>
 #include <stdio.h>
 #include <time.h>
@@ -83,11 +84,11 @@ void run_two_opt_random_walk(TSPGraph *graph, const char *instance_name) {
 
     // ----- AFFICHAGE -----
     printf("Instance ; Méthode ; Temps CPU (sec) ; longueur ; Tour\n");
-    printf("%s ; 2optrw ; %.3f ; %.12f ;\n[", instance_name, temps_cpu, new_cost);
+    printf("%s ; 2optrw ; %.3f ; %.12f ; [", instance_name, temps_cpu, new_cost);
 
     for (int i = 0; i < n; i++) {
         printf("%d", tour[i] + 1);
-        if (i < n - 1) printf(",");
+        if (i < n - 1) printf(", ");
     }
     printf("]\n");
 
@@ -99,36 +100,7 @@ void run_two_opt_nearest_neighbor(TSPGraph *graph, const char *instance_name) {
 
     int n = graph->num_nodes;
 
-    int *tour = malloc(n * sizeof(int));
-    int *visited = calloc(n, sizeof(int));
-
-    if (!tour || !visited) {
-        fprintf(stderr, "Erreur allocation NN-2opt.\n");
-        return;
-    }
-
-    // ----- NEAREST NEIGHBOR -----
-    tour[0] = 0;
-    visited[0] = 1;
-
-    for (int i = 1; i < n; i++) {
-        int prev = tour[i - 1];
-        double best = 1e18;
-        int best_j = -1;
-
-        for (int j = 0; j < n; j++) {
-            if (!visited[j]) {
-                double d = get_distance(graph->matrix, prev, j);
-                if (d < best) {
-                    best = d;
-                    best_j = j;
-                }
-            }
-        }
-
-        tour[i] = best_j;
-        visited[best_j] = 1;
-    }
+    int *tour = calculate_2opt_nn(graph);
 
     // ----- 2-OPT -----
     clock_t debut = clock();
@@ -137,16 +109,16 @@ void run_two_opt_nearest_neighbor(TSPGraph *graph, const char *instance_name) {
 
     // ----- AFFICHAGE -----
     printf("Instance ; Méthode ; Temps CPU (sec) ; longueur ; Tour\n");
-    printf("%s ; 2optnn ; %.3f ; %.12f ;\n[", instance_name, temps_cpu, new_cost);
+    printf("%s ; 2optnn ; %.3f ; %.12f ; [", instance_name, temps_cpu, new_cost);
 
     for (int i = 0; i < n; i++) {
         printf("%d", tour[i] + 1);
-        if (i < n - 1) printf(",");
+        if (i < n - 1) printf(", ");
     }
 
     printf("]\n");
 
     free(tour);
-    free(visited);
+
 }
 

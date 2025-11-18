@@ -100,7 +100,6 @@ int parse_args(int argc, char *argv[], const char **filename, int *can, int *bf,
         } else {
             usage(argv[0]);
             return -1;
-
         }
     }
     DEBUG_PRINT("PARSE ARGS exit success\n");
@@ -143,10 +142,10 @@ int canonical_mode(TSPGraph *graph, TSPInstance instance){
 /**
  * @brief Affiche les résultats finaux au format CSV normalisé.
  */
-void print_final_results(char *method, double temps_cpu, double longueur, int *permutation, int n) {
+void print_final_results(char *instance_name, char *method, double temps_cpu, double longueur, int *permutation, int n) {
     printf("Instance ; Methode ; Temps CPU (sec) ; Longueur ; Tour\n");
-    printf("%s ; nn ; %.3f ; %.12f ; ", method, temps_cpu, longueur);
-    print_tour(permutation, n - 1);  // Tour
+    printf("%s ; %s ; %.3f ; %.12f ; ", instance_name, method, temps_cpu, longueur);
+    print_tour(permutation, n);  // Tour
     printf("\n");
 }
 

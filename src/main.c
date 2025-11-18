@@ -10,6 +10,7 @@
 #include "../include/utils.h"
 #include "../include/nearest_neighbor.h"
 #include "../include/random_walk.h"
+#include "../include/genetic.h"
 #include "../include/two_opt.h"
 
 #define POP_SIZE               100
@@ -24,6 +25,7 @@ int main(int argc, char *argv[]) {
     int bf = 0;
     int nn = 0;
     int rw = 0;
+    int ga = 0;
     int twooptnn = 0;
     int twooptrw = 0; 
     int ga = 0;
@@ -45,7 +47,7 @@ int main(int argc, char *argv[]) {
     TSPGraph *graph = create_graph(&instance);
     if (!graph) { free_half_matrix(instance.half_matrix); return EXIT_FAILURE; }
 
-    /* canonical mode: compute canonical tour */
+    // Méthode Canonical
     if (can) {
         if((can_len = canonical_mode(graph, instance)) == -1) {
             free_graph(graph);
@@ -74,7 +76,7 @@ int main(int argc, char *argv[]) {
         DEBUG_PRINT("Running Genetic Algorithm with pop_size=%d, generations=%d, mutation_rate=%.2f\n", pop_size, num_generations, mutation_rate);
         run_genetic_algorithm(graph, instance.name, pop_size, num_generations, mutation_rate);
     }
-    
+  
     free_graph(graph);
     free_half_matrix(instance.half_matrix);
     printf("Successfully exited.\n");

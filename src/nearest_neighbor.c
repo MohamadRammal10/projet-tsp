@@ -123,7 +123,7 @@ void run_nearest_neighbor(TSPGraph *graph, const char *instance_name) {
     double temps_cpu = (double)(clock() - debut) / CLOCKS_PER_SEC;
 
     // Étape 4 : affichage standardisé
-    print_final_results((char *)instance_name, temps_cpu, longueur, permutation, n);
+    print_final_results((char *)instance_name, "nn", temps_cpu, longueur, permutation, n);
 
     liberer_tableaux_nn(permutation, tour_complet);
     return;
@@ -135,7 +135,7 @@ void run_nearest_neighbor(TSPGraph *graph, const char *instance_name) {
  * @param graph Graphe du TSP.
  * @param instance_name Nom de l’instance (pour affichage).
  */
-int *calculate_2opt(TSPGraph *graph) {
+int *calculate_2opt_nn(TSPGraph *graph){
     if (!graph || graph->num_nodes <= 1) return NULL;
 
     int n = graph->num_nodes;
@@ -155,5 +155,7 @@ int *calculate_2opt(TSPGraph *graph) {
         tour_complet[i + 1] = permutation[i];
     tour_complet[n] = 0;
 
+
+    free(permutation);
     return tour_complet;
 }
