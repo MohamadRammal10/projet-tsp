@@ -155,7 +155,7 @@ int *calculate_2opt_nn(TSPGraph *graph){
         tour_complet[i + 1] = permutation[i];
     tour_complet[n] = 0;
 
-    free(permutation);
 
+    free(permutation);
     return tour_complet;
 }

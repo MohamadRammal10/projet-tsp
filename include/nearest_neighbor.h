@@ -18,10 +18,8 @@ void run_nearest_neighbor(TSPGraph *graph, const char *instance_name);
 
 /**
  * @brief Exécute l'algorithme du plus proche voisin pour 2-opt.
- * 
  * @param graph Graphe du TSP.
  */
 int* calculate_2opt_nn(TSPGraph *graph);
-
 
 #endif
