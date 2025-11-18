@@ -1,6 +1,7 @@
 #include "../include/two_opt.h"
 #include "../include/distance_matrix.h"
 #include "../include/nearest_neighbor.h"
+#include "../include/utils.h"
 #include <stdlib.h>
 #include <stdio.h>
 #include <time.h>
@@ -83,14 +84,7 @@ void run_two_opt_random_walk(TSPGraph *graph, const char *instance_name) {
     double temps_cpu = (double)(clock() - debut) / CLOCKS_PER_SEC;
 
     // ----- AFFICHAGE -----
-    printf("Instance ; Méthode ; Temps CPU (sec) ; longueur ; Tour\n");
-    printf("%s ; 2optrw ; %.3f ; %.12f ; [", instance_name, temps_cpu, new_cost);
-
-    for (int i = 0; i < n; i++) {
-        printf("%d", tour[i] + 1);
-        if (i < n - 1) printf(", ");
-    }
-    printf("]\n");
+    print_final_results((char *)instance_name, "2optrw", temps_cpu, new_cost, tour, n);
 
     free(tour);
 }
@@ -108,15 +102,7 @@ void run_two_opt_nearest_neighbor(TSPGraph *graph, const char *instance_name) {
     double temps_cpu = (double)(clock() - debut) / CLOCKS_PER_SEC;
 
     // ----- AFFICHAGE -----
-    printf("Instance ; Méthode ; Temps CPU (sec) ; longueur ; Tour\n");
-    printf("%s ; 2optnn ; %.3f ; %.12f ; [", instance_name, temps_cpu, new_cost);
-
-    for (int i = 0; i < n; i++) {
-        printf("%d", tour[i] + 1);
-        if (i < n - 1) printf(", ");
-    }
-
-    printf("]\n");
+    print_final_results((char *)instance_name, "2optnn", temps_cpu, new_cost, tour, n);
 
     free(tour);
 
