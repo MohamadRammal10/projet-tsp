@@ -28,7 +28,6 @@ int main(int argc, char *argv[]) {
     int ga = 0;
     int twooptnn = 0;
     int twooptrw = 0; 
-    int ga = 0;
     
     // ga param
     int pop_size = POP_SIZE;
