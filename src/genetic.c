@@ -10,9 +10,6 @@
 // =======================
 // Paramètres du GA
 // =======================
-#define GA_POPULATION_SIZE     30
-#define GA_GENERATIONS         1000
-#define GA_MUTATION_RATE       0.10
 #define GA_TOURNAMENT_RATIO    0.5   // 50% de la population
 
 typedef struct {
@@ -174,10 +171,10 @@ static int ga_compare_individuals(const void *a, const void *b) {
 // Gestion du contexte GA
 // -----------------------
 
-static void ga_init_context(GAContext *ctx, TSPGraph *graph) {
-    ctx->pop_size      = GA_POPULATION_SIZE;
-    ctx->generations   = GA_GENERATIONS;
-    ctx->mutation_rate = GA_MUTATION_RATE;
+static void ga_init_context(GAContext *ctx, TSPGraph *graph, int pop_size, int generations, double mutation_rate) {
+    ctx->pop_size      = pop_size;
+    ctx->generations   = generations;
+    ctx->mutation_rate = mutation_rate;
     ctx->n             = graph->num_nodes;
 
     ctx->tournament_size = (int)(GA_TOURNAMENT_RATIO * ctx->pop_size);
@@ -345,7 +342,7 @@ static void ga_run_generations(GAContext *ctx, TSPGraph *graph) {
 // Fonction principale = pseudo-code propre
 // -----------------------
 
-void run_genetic_algorithm(TSPGraph *graph, const char *instance_name) {
+void run_genetic_algorithm(TSPGraph *graph, const char *instance_name, int pop_size, int generations, double mutation_rate) {
     if (!graph) {
         fprintf(stderr, "run_genetic_algorithm: graph is NULL\n");
         return;
@@ -360,7 +357,7 @@ void run_genetic_algorithm(TSPGraph *graph, const char *instance_name) {
 
     // 1) créer le contexte
     GAContext ctx;
-    ga_init_context(&ctx, graph);
+    ga_init_context(&ctx, graph, pop_size, generations, mutation_rate);
 
     // 2) initialiser la population + meilleur global
     ga_initialize_population_and_best(&ctx, graph);

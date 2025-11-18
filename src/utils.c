@@ -34,6 +34,8 @@ void usage(const char *p) {
     printf("  -m rw        Run random walk search\n");
     printf("  -m 2optnn    Run 2-opt nearest-neighbor search\n");
     printf("  -m 2optrw    Run 2-opt random walk search\n");
+    printf("  -m ga <pop_size> <num_generations> <mutation_rate>       Test genetic algorithm mode\n");
+
 
     printf("\n");
     printf(" -> Testing config :\n");
@@ -45,7 +47,6 @@ void usage(const char *p) {
     printf("   2optnn      Test 2-opt nearest-neighbor mode\n");
     printf("   2optrw      Test 2-opt random walk mode\n");
     printf("   ga          Test genetic algorithm mode\n");
-    
 }
 
 /**
@@ -53,8 +54,9 @@ void usage(const char *p) {
  * @return -1 if an error occurs.
  * @return 0 on success.
  */
-int parse_args(int argc, char *argv[], const char **filename, int *can, int *bf, int *nn, int *rw, int *twooptnn, int *twooptrw, int *ga){ 
-    if((argc == 2 && !strcmp(argv[1], "-h")) || argc == 1 ) {
+
+int parse_args(int argc, char *argv[], const char **filename, int *can, int *bf, int *nn, int *rw, int *twooptnn, int *twooptrw, int *ga, int *pop_size, int *num_generations, double *mutation_rate){ 
+    if((argc == 2 && !strcmp(argv[1], "-h")) || argc == 1 || argc > 8) {
         usage(argv[0]);
         return EXIT_SUCCESS;
     }
@@ -80,8 +82,14 @@ int parse_args(int argc, char *argv[], const char **filename, int *can, int *bf,
                 *rw = 1;
             } else if (!strcmp(m, "ga")) {
                 *ga = 1;
+                if (i + 3 < argc) {
+                *pop_size = atoi(argv[++i]);
+                *num_generations = atoi(argv[++i]);
+                *mutation_rate = atof(argv[++i]);
+                }
+                return 0;
             } else if (!strcmp(m, "2optnn")) {
-                *twooptnn = 1;   
+                *twooptnn = 1;
             } else if (!strcmp(m, "2optrw")) {
                 *twooptrw = 1;
             } else {
@@ -94,6 +102,7 @@ int parse_args(int argc, char *argv[], const char **filename, int *can, int *bf,
             return -1;
         }
     }
+    DEBUG_PRINT("PARSE ARGS exit success\n");
     return 0;
 }
 
