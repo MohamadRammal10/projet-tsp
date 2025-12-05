@@ -1,4 +1,5 @@
 ./att10.tsp
+./att15.tsp
 ./example.tsp
 ./geo.tsp
 ./att15.tsp

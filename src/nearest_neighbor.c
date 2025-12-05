@@ -98,7 +98,7 @@ void run_nearest_neighbor(TSPGraph *graph, const char *instance_name) {
     if (!graph || graph->num_nodes <= 1) return;
 
     int n = graph->num_nodes;
-    int *permutation = malloc((n - 1) * sizeof(int));
+    int *permutation = malloc(n * sizeof(int));
     int *tour_complet = malloc((n + 1) * sizeof(int));
 
     if (!permutation || !tour_complet) {
@@ -111,6 +111,7 @@ void run_nearest_neighbor(TSPGraph *graph, const char *instance_name) {
 
     // Étape 1 : construire la permutation
     construire_permutation_nn(graph, permutation);
+    permutation[n-1]=0;
 
     // Étape 2 : créer la tournée complète [0, perm..., 0]
     tour_complet[0] = 0;

@@ -22,7 +22,7 @@
 // Function declarations
 // -----------------------------------------------------------------------------
 void usage(const char *p);
-int parse_args(int argc, char *argv[], const char **filename, int *can, int *bf, int *nn, int *rw, int *twooptnn, int *twooptrw, int *ga, int *pop_size, int *num_generations, double *mutation_rate);
+int parse_args(int argc, char *argv[], const char **filename, int *can, int *bf, int *nn, int *rw, int *twooptnn, int *twooptrw, int *ga, int *gadpx, int *pop_size, int *num_generations, double *mutation_rate);
 int canonical_mode(TSPGraph *graph, TSPInstance instance);
 void print_final_results(char* instance_name, char *method, double temps_cpu, double longueur, int *permutation, int n);
 void print_bf_results(BruteForceState *state);

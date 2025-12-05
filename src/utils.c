@@ -35,6 +35,8 @@ void usage(const char *p) {
     printf("  -m 2optnn    Run 2-opt nearest-neighbor search\n");
     printf("  -m 2optrw    Run 2-opt random walk search\n");
     printf("  -m ga <pop_size> <num_generations> <mutation_rate>       Test genetic algorithm mode\n");
+    printf("  -m gadpx <pop_size> <num_generations> <mutation_rate>    Genetic algorithm (DPX + 2-opt)\n");
+
 
 
     printf("\n");
@@ -47,6 +49,9 @@ void usage(const char *p) {
     printf("   2optnn      Test 2-opt nearest-neighbor mode\n");
     printf("   2optrw      Test 2-opt random walk mode\n");
     printf("   ga          Test genetic algorithm mode\n");
+    printf("   gadpx       Test genetic algorithm mode (DPX + 2-opt)\n");
+
+
 }
 
 /**
@@ -55,8 +60,8 @@ void usage(const char *p) {
  * @return 0 on success.
  */
 
-int parse_args(int argc, char *argv[], const char **filename, int *can, int *bf, int *nn, int *rw, int *twooptnn, int *twooptrw, int *ga, int *pop_size, int *num_generations, double *mutation_rate){ 
-    if((argc == 2 && !strcmp(argv[1], "-h")) || argc == 1 || argc > 8) {
+int parse_args(int argc, char *argv[], const char **filename, int *can, int *bf, int *nn, int *rw, int *twooptnn, int *twooptrw, int *ga, int* gadpx, int *pop_size, int *num_generations, double *mutation_rate){ 
+    if((argc == 2 && !strcmp(argv[1], "-h")) || argc == 1 || argc > 9) {
         usage(argv[0]);
         return EXIT_SUCCESS;
     }
@@ -88,10 +93,22 @@ int parse_args(int argc, char *argv[], const char **filename, int *can, int *bf,
                 *mutation_rate = atof(argv[++i]);
                 }
                 return 0;
-            } else if (!strcmp(m, "2optnn")) {
+              
+            } else if (!strcmp(m, "gadpx")) {
+                *gadpx = 1;
+                if (i + 3 < argc) {
+                *pop_size = atoi(argv[++i]);
+                *num_generations = atoi(argv[++i]);
+                *mutation_rate = atof(argv[++i]);
+                }
+                return 0;
+            }
+             else if (!strcmp(m, "2optnn")) {
                 *twooptnn = 1;
             } else if (!strcmp(m, "2optrw")) {
                 *twooptrw = 1;
+            } else if (!strcmp(m, "2optrw")) {
+                *gadpx = 1;
             } else {
                 fprintf(stderr, "Unknown method '%s'\n", m);
                 usage(argv[0]);
