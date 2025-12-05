@@ -1,6 +1,8 @@
 #include "../include/two_opt.h"
 #include "../include/distance_matrix.h"
 #include "../include/nearest_neighbor.h"
+#include "../include/utils.h"
+#include "../include/random_walk.h"
 #include <stdlib.h>
 #include <stdio.h>
 #include <time.h>
@@ -64,18 +66,8 @@ double two_opt_optimize(TSPGraph *graph, int *tour, int n) {
 void run_two_opt_random_walk(TSPGraph *graph, const char *instance_name) {
 
     int n = graph->num_nodes;
-    int *tour = malloc(n * sizeof(int));
 
-    // Random Walk
-    for (int i = 0; i < n; i++) tour[i] = i;
-
-    srand(time(NULL));
-    for (int i = n - 1; i > 1; i--) {
-        int j = 1 + rand() % (i - 1);
-        int tmp = tour[i];
-        tour[i] = tour[j];
-        tour[j] = tmp;
-    }
+    int *tour = random_walk_optimize(graph);
 
     // ----- 2-OPT -----
     clock_t debut = clock();
@@ -83,14 +75,7 @@ void run_two_opt_random_walk(TSPGraph *graph, const char *instance_name) {
     double temps_cpu = (double)(clock() - debut) / CLOCKS_PER_SEC;
 
     // ----- AFFICHAGE -----
-    printf("Instance ; Méthode ; Temps CPU (sec) ; longueur ; Tour\n");
-    printf("%s ; 2optrw ; %.3f ; %.12f ; [", instance_name, temps_cpu, new_cost);
-
-    for (int i = 0; i < n; i++) {
-        printf("%d", tour[i] + 1);
-        if (i < n - 1) printf(", ");
-    }
-    printf("]\n");
+    print_final_results((char *)instance_name, "2optrw", temps_cpu, new_cost, tour, n);
 
     free(tour);
 }
@@ -108,15 +93,7 @@ void run_two_opt_nearest_neighbor(TSPGraph *graph, const char *instance_name) {
     double temps_cpu = (double)(clock() - debut) / CLOCKS_PER_SEC;
 
     // ----- AFFICHAGE -----
-    printf("Instance ; Méthode ; Temps CPU (sec) ; longueur ; Tour\n");
-    printf("%s ; 2optnn ; %.3f ; %.12f ; [", instance_name, temps_cpu, new_cost);
-
-    for (int i = 0; i < n; i++) {
-        printf("%d", tour[i] + 1);
-        if (i < n - 1) printf(", ");
-    }
-
-    printf("]\n");
+    print_final_results((char *)instance_name, "2optnn", temps_cpu, new_cost, tour, n);
 
     free(tour);
 
