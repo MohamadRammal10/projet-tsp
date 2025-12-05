@@ -26,15 +26,16 @@ int main(int argc, char *argv[]) {
     int nn = 0;
     int rw = 0;
     int ga = 0;
+    int gadpx = 0;
     int twooptnn = 0;
-    int twooptrw = 0; 
+    int twooptrw = 0;
     
     // ga param
     int pop_size = POP_SIZE;
     int num_generations = NUM_GENERATIONS;
     double mutation_rate = MUTATION_RATE;
 
-    if (parse_args(argc, argv, &filename, &can, &bf, &nn, &rw, &twooptnn, &twooptrw, &ga, &pop_size, &num_generations, &mutation_rate) == -1){
+    if (parse_args(argc, argv, &filename, &can, &bf, &nn, &rw, &twooptnn, &twooptrw, &ga, &gadpx, &pop_size, &num_generations, &mutation_rate) == -1){
         return EXIT_FAILURE;
     }
 
@@ -74,6 +75,10 @@ int main(int argc, char *argv[]) {
     if (ga) { 
         DEBUG_PRINT("Running Genetic Algorithm with pop_size=%d, generations=%d, mutation_rate=%.2f\n", pop_size, num_generations, mutation_rate);
         run_genetic_algorithm(graph, instance.name, pop_size, num_generations, mutation_rate);
+    }
+    if (gadpx){
+        DEBUG_PRINT("Running Genetic Algorithm DPX (gadpx) with pop_size=%d, generations=%d, mutation_rate=%.2f\n", pop_size, num_generations, mutation_rate);
+        run_genetic_algorithm_dpx(graph, instance.name, pop_size, num_generations, mutation_rate);
     }
   
     free_graph(graph);
