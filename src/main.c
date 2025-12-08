@@ -20,69 +20,63 @@
 
 int main(int argc, char *argv[]) {
     const char *filename = NULL;
-    int can = 0;
-    double can_len = 0.0;
-    int bf = 0;
-    int nn = 0;
-    int rw = 0;
-    int ga = 0;
-    int gadpx = 0;
-    int twooptnn = 0;
-    int twooptrw = 0;
-    
-    // ga param
+    int can = 0, bf = 0, nn = 0, rw = 0, ga = 0, gadpx = 0, twooptnn = 0, twooptrw = 0, all = 0;
     int pop_size = POP_SIZE;
     int num_generations = NUM_GENERATIONS;
     double mutation_rate = MUTATION_RATE;
 
-    if (parse_args(argc, argv, &filename, &can, &bf, &nn, &rw, &twooptnn, &twooptrw, &ga, &gadpx, &pop_size, &num_generations, &mutation_rate) == -1){
+    if (parse_args(argc, argv, &filename, &can, &bf, &nn, &rw, &twooptnn, &twooptrw, &ga, &gadpx, &all, &pop_size, &num_generations, &mutation_rate) == -1){
         return EXIT_FAILURE;
     }
 
-    /* read file instance */
     TSPInstance instance;
     if (read_tsplib(filename, &instance) != 0) return EXIT_FAILURE;
 
-    /* create graph from instance*/
     TSPGraph *graph = create_graph(&instance);
-    if (!graph) { free_half_matrix(instance.half_matrix); return EXIT_FAILURE; }
+    if (!graph) { 
+        free_tsp_instance(&instance);
+        free_half_matrix(instance.half_matrix); 
+        return EXIT_FAILURE; 
+    }
+    if (all) {
+        bf = 1;
+        nn = 1;
+        rw = 1;
+        twooptnn = 1;
+        twooptrw = 1;
+        ga = 1;
+        gadpx = 1;
+    }
 
-    // Méthode Canonical
     if (can) {
-        if((can_len = canonical_mode(graph, instance)) == -1) {
+        double can_len = canonical_mode(graph, instance);
+        if (can_len == -1) {
             free_graph(graph);
             free_half_matrix(instance.half_matrix);
+            free_tsp_instance(&instance);
             return EXIT_FAILURE;
         }
     }
 
-    // Méthode Brute Force
     if (bf) run_brute_force_graph(graph, instance.name);
-    
-    // Méthode Nearest Neighbor
     if (nn) run_nearest_neighbor(graph, instance.name);
-    
-    // Méthode Random Walk
     if (rw) run_random_walk(graph, instance.name);
-    
-    // Méthode 2-opt Nearest Neighbor
     if (twooptnn) run_two_opt_nearest_neighbor(graph, instance.name);
-
-    // Méthode 2-opt Random Walk
     if (twooptrw) run_two_opt_random_walk(graph, instance.name);
-
-    // Genetic algorithm
+    
     if (ga) { 
-        DEBUG_PRINT("Running Genetic Algorithm with pop_size=%d, generations=%d, mutation_rate=%.2f\n", pop_size, num_generations, mutation_rate);
+        DEBUG_PRINT("Running Genetic Algorithm...\n");
         run_genetic_algorithm(graph, instance.name, pop_size, num_generations, mutation_rate);
     }
     if (gadpx){
-        DEBUG_PRINT("Running Genetic Algorithm DPX (gadpx) with pop_size=%d, generations=%d, mutation_rate=%.2f\n", pop_size, num_generations, mutation_rate);
+        DEBUG_PRINT("Running Genetic Algorithm DPX...\n");
         run_genetic_algorithm_dpx(graph, instance.name, pop_size, num_generations, mutation_rate);
     }
   
     free_graph(graph);
     free_half_matrix(instance.half_matrix);
+    free_tsp_instance(&instance);
+    
     printf("Successfully exited.\n");
     return 0;
 }

@@ -29,6 +29,7 @@ void usage(const char *p) {
     printf("  -h           Show this help message.\n");
     printf("  -f <file>    TSPLIB instance file\n");
     printf("  -c           Run canonical search\n");
+    printf("  -m all       Run all algorithms\n");
     printf("  -m bf        Run brute-force search\n");
     printf("  -m nn        Run nearest-neighbor search\n");
     printf("  -m rw        Run random walk search\n");
@@ -43,6 +44,7 @@ void usage(const char *p) {
     printf(" -> Testing config :\n");
     printf("   Usage: python3 test_tsp_c.py\n");
     printf("   -c          Test canonical mode\n");
+    printf("   all         Test all algorithms\n");    
     printf("   bf          Test brute force mode\n");
     printf("   nn          Test nearest neighbor mode\n");
     printf("   rw          Test random walk mode\n");
@@ -60,7 +62,7 @@ void usage(const char *p) {
  * @return 0 on success.
  */
 
-int parse_args(int argc, char *argv[], const char **filename, int *can, int *bf, int *nn, int *rw, int *twooptnn, int *twooptrw, int *ga, int* gadpx, int *pop_size, int *num_generations, double *mutation_rate){ 
+int parse_args(int argc, char *argv[], const char **filename, int *can, int *bf, int *nn, int *rw, int *twooptnn, int *twooptrw, int *ga, int* gadpx, int *all, int *pop_size, int *num_generations, double *mutation_rate){ 
     if((argc == 2 && !strcmp(argv[1], "-h")) || argc == 1 || argc > 9) {
         usage(argv[0]);
         return EXIT_SUCCESS;
@@ -81,7 +83,11 @@ int parse_args(int argc, char *argv[], const char **filename, int *can, int *bf,
             const char *m = argv[++i];
             if (!strcmp(m, "bf")) {
                 *bf = 1;
-            } else if (!strcmp(m, "nn")) {
+            }
+             else if (!strcmp(m, "all")) {
+                *all = 1;
+            }
+             else if (!strcmp(m, "nn")) {
                 *nn = 1;
             } else if (!strcmp(m, "rw")) {
                 *rw = 1;

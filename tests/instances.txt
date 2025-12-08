@@ -1,7 +1,6 @@
 ./att10.tsp
-./att15.tsp
-./example.tsp
 ./geo.tsp
+./example.tsp
 ./att15.tsp
 ./att48.tsp
 ./a280.tsp

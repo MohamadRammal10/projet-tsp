@@ -113,3 +113,17 @@ int read_node_coords(FILE *file, TSPInstance *instance){
     }
     return 0;
 }
+
+/**
+ * @brief Free TSPInstance coordinates.
+ */
+void free_tsp_instance(TSPInstance *instance) {
+    if (!instance) return;
+    if (instance->coords) {
+        for (int i = 0; i < instance->dimension; i++) {
+            free(instance->coords[i]);
+        }
+        free(instance->coords);
+        instance->coords = NULL;
+    }
+}
