@@ -24,6 +24,6 @@ int read_tsplib(const char *filename, TSPInstance *instance);
 int read_node_coords(FILE *file, TSPInstance *instance);
 int build_distance_matrix(TSPInstance *instance, DistanceFunc dist_func);
 double to_radians(double coord);
-
+void free_tsp_instance(TSPInstance *instance);
 
 #endif
