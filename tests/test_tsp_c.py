@@ -115,6 +115,8 @@ if __name__ == "__main__":
         print("   bf       Brute-force")
         print("   nn       Nearest Neighbor")
         print("   rw       Random walk")
+        print("   2optnn   Two-opt Nearest Neighbor")
+        print("   2optrw   Two-opt Random Walk")
         print("   ga       Genetic Algorithm")
         print("   gadpx    Genetic Algorithm with dpx")
         sys.exit(1)
