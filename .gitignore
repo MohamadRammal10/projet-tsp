@@ -1,1 +1,3 @@
 venv/*.o
+venv/
+**/.DS_Store
