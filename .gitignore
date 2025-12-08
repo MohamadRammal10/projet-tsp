@@ -1,7 +1,21 @@
-venv/*.o
+# Fichiers objets
+*.o
+
+# Virtualenv
 venv/
+
+# Fichiers systeme
 **/.DS_Store
+
+# cache Python
 __pycache__/
 *.pyc
+
+# IDE
 .vscode/
+
+# Suivie du projet
 TODO.txt
+
+# Executable eventuel
+tsp
