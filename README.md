@@ -1,5 +1,7 @@
 # Traveling Salesman Problem (TSP)
 
+[Project management](https://docs.google.com/spreadsheets/d/1D0tdRev2FNDUF0lIM8KSrpiOma9Gkf4VGkew63VwrPA/edit?gid=871870674#gid=871870674)
+
 ## Team Introduction
 
 Our development team consists of four members :
