@@ -1,6 +1,4 @@
-# Project Title
-
-![Project Logo](path/to/logo.png)
+# Traveling Salesman Problem (TSP)
 
 ## Team Introduction
 
