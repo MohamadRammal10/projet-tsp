@@ -59,7 +59,7 @@ static void ga_random_permutation(int *perm, int n) {
         perm[j] = tmp;
     }
 }
-
+//creation population
 static void ga_init_population(GAIndividual *pop, int pop_size, int n, TSPGraph *graph) {
     for (int i = 0; i < pop_size; ++i) {
         pop[i].perm = (int *)malloc(n * sizeof(int));
@@ -67,7 +67,7 @@ static void ga_init_population(GAIndividual *pop, int pop_size, int n, TSPGraph 
             fprintf(stderr, "Malloc error in ga_init_population\n");
             exit(EXIT_FAILURE);
         }
-        ga_random_permutation(pop[i].perm, n);
+        ga_random_permutation(pop[i].perm, n); //chqaue individus recoit une permutation via Fisher-Yates
         pop[i].fitness = ga_tour_cost(graph, pop[i].perm, n);
     }
 }
@@ -77,9 +77,9 @@ static void ga_free_population(GAIndividual *pop, int pop_size) {
     for (int i = 0; i < pop_size; ++i) {
         free(pop[i].perm);
     }
-    free(pop);
 }
 
+//selection par tournoi
 static void ga_tournament_selection(
     GAIndividual *population,
     int pop_size,
@@ -98,7 +98,7 @@ static void ga_tournament_selection(
                 best_idx = idx;
             }
         }
-        selected_indices[i] = best_idx;
+        selected_indices[i] = best_idx; //on garde toujours le milleur
     }
 }
 
@@ -122,7 +122,7 @@ static void ga_ordered_crossover(
         child[i] = -1;
     }
 
-    // segment de A
+    // segment de A dans l'interval choisi au hasard
     for (int i = start; i < end; ++i) {
         child[i] = parent_a[i];
     }
@@ -174,6 +174,7 @@ static int ga_compare_individuals(const void *a, const void *b) {
 // -----------------------
 
 static void ga_init_context(GAContext *ctx, TSPGraph *graph, int pop_size, int generations, double mutation_rate) {
+    //copie les parametres passees par le main ou par les arguments lors de l'appel
     ctx->pop_size      = pop_size;
     ctx->generations   = generations;
     ctx->mutation_rate = mutation_rate;
@@ -182,7 +183,7 @@ static void ga_init_context(GAContext *ctx, TSPGraph *graph, int pop_size, int g
     ctx->tournament_size = (int)(GA_TOURNAMENT_RATIO * ctx->pop_size);
     if (ctx->tournament_size < 2) ctx->tournament_size = 2;
     if (ctx->tournament_size > ctx->pop_size) ctx->tournament_size = ctx->pop_size;
-
+    //allocation de la memoire pour la population et les enfants.
     ctx->population = (GAIndividual *)malloc(ctx->pop_size * sizeof(GAIndividual));
     ctx->offspring  = (GAIndividual *)malloc(ctx->pop_size * sizeof(GAIndividual));
     if (!ctx->population || !ctx->offspring) {
@@ -210,7 +211,7 @@ static void ga_init_context(GAContext *ctx, TSPGraph *graph, int pop_size, int g
         fprintf(stderr, "Malloc error for best_perm\n");
         exit(EXIT_FAILURE);
     }
-
+    // je garde une copie du meilleur individu global
     ctx->best_fitness = DBL_MAX;
 }
 
@@ -222,13 +223,10 @@ static void ga_free_context(GAContext *ctx) {
     free(ctx->best_perm);
 }
 
-// -----------------------
-// Étapes "haut niveau" du GA (version OX standard)
-// -----------------------
 
 static void ga_initialize_population_and_best(GAContext *ctx, TSPGraph *graph) {
-    ga_init_population(ctx->population, ctx->pop_size, ctx->n, graph);
-
+    ga_init_population(ctx->population, ctx->pop_size, ctx->n, graph); //initialisation de la population
+    //calculer le meilleur individu global pour demarrage avec elitisme
     ctx->best_fitness = DBL_MAX;
     for (int i = 0; i < ctx->pop_size; ++i) {
         if (ctx->population[i].fitness < ctx->best_fitness) {
@@ -270,10 +268,10 @@ static void ga_create_offspring(GAContext *ctx, TSPGraph *graph) {
         ctx->offspring[i].fitness = ga_tour_cost(graph, ctx->offspring[i].perm, ctx->n);
     }
 
-    // 4) tri des enfants par fitness
+    // 4) tri des enfants par longueur
     qsort(ctx->offspring, ctx->pop_size, sizeof(GAIndividual), ga_compare_individuals);
 
-    // 5) population <- enfants (swap de pointeurs)
+    // 5)remplace population par enfants (swap de pointeurs)
     GAIndividual *tmp = ctx->population;
     ctx->population   = ctx->offspring;
     ctx->offspring    = tmp;
@@ -289,7 +287,7 @@ static void ga_inject_random_individual(GAContext *ctx, TSPGraph *graph) {
             worst_idx = i;
         }
     }
-
+    //diversite et evie de se bloquee
     ga_random_permutation(ctx->population[worst_idx].perm, ctx->n);
     ctx->population[worst_idx].fitness =
         ga_tour_cost(graph, ctx->population[worst_idx].perm, ctx->n);
@@ -352,6 +350,8 @@ typedef struct {
 // construit les fragments : parent1 est découpé selon les arêtes communes avec parent2
 static int dpx_build_fragments(const int *parent1, const int *parent2, int n,
                                DPXFragment *frags) {
+   
+    // position de chaque ville dans parent2
     int *pos2 = (int *)malloc(n * sizeof(int));
     if (!pos2) {
         fprintf(stderr, "Malloc error in dpx_build_fragments pos2\n");
@@ -361,19 +361,19 @@ static int dpx_build_fragments(const int *parent1, const int *parent2, int n,
         pos2[parent2[i]] = i;
     }
 
-    int frag_start = 0;
+    int frag_start = 0; 
     int nb_frag = 0;
-
+    // on parcourt toutes les arêtes consécutives de parent1
     for (int i = 0; i < n - 1; ++i) {
         int a = parent1[i];
         int b = parent1[i + 1];
-
+        // voisins de 'a' dans parent2
         int idx = pos2[a];
         int left  = parent2[(idx - 1 + n) % n];
         int right = parent2[(idx + 1) % n];
-
+        // l'arête (a,b) est-elle commune aux deux parents ?
         int common = (b == left || b == right);
-
+         // ajout du dernier fragment (fin de parent1)
         if (!common) {
             frags[nb_frag].start  = frag_start;
             frags[nb_frag].length = i - frag_start + 1;
@@ -390,14 +390,14 @@ static int dpx_build_fragments(const int *parent1, const int *parent2, int n,
     free(pos2);
     return nb_frag;
 }
-
+//verifie si l'arrete (u,v) existe dans une tournee
 static int edge_in_parent(const int *perm, const int *pos, int n, int u, int v) {
     int i = pos[u];
     int left  = perm[(i - 1 + n) % n];
     int right = perm[(i + 1) % n];
     return (v == left || v == right);
 }
-
+//verifie si l'arrete (u,v) existe dans au moins un des deux parentsS
 static int edge_in_parents(const int *p1, const int *pos1,
                            const int *p2, const int *pos2,
                            int n, int u, int v) {
@@ -434,18 +434,20 @@ static void dpx_append_fragment_to_child(const int *parent1,
                                          int *child_pos,
                                          int *current_end) {
     if (orient == 0) {
-        // orientation normale
+        // copie du fragment dans l'ordre normal
         for (int k = 0; k < frag->length; ++k) {
             child[*child_pos] = parent1[frag->start + k];
             (*child_pos)++;
         }
+        // dernière ville ajoutée = fin du fragment
         *current_end = parent1[frag->start + frag->length - 1];
     } else {
-        // orientation inversée
+        // copie du fragment en ordre inversé
         for (int k = frag->length - 1; k >= 0; --k) {
             child[*child_pos] = parent1[frag->start + k];
             (*child_pos)++;
         }
+        // dernière ville ajoutée = début du fragment
         *current_end = parent1[frag->start]; 
     }
 }
@@ -463,14 +465,16 @@ static void dpx_find_best_fragment_to_connect(const int *parent1,
                                               TSPGraph *graph,
                                               int *chosen_frag,
                                               int *chosen_orient) {
+    // meilleur choix sans réutiliser d'arête des parents
     double best_allowed_dist = DBL_MAX;
     int best_allowed_frag    = -1;
     int best_allowed_orient  = 0;
-
+    // meilleur choix au global                                            
     double best_any_dist = DBL_MAX;
     int best_any_frag    = -1;
     int best_any_orient  = 0;
-
+    
+    // on teste tous les fragments non utilisés
     for (int f = 0; f < nb_frag; ++f) {
         if (used[f]) continue;
 
@@ -478,17 +482,19 @@ static void dpx_find_best_fragment_to_connect(const int *parent1,
         int start_city = parent1[frag->start];
         int end_city   = parent1[frag->start + frag->length - 1];
 
-        // candidat: connecter current_end -> start_city (normal)
+        // candidat: connecter current_end -> start_city (sens normal)
         {
             double d = get_graph_distance(graph, current_end, start_city);
             int forbidden = edge_in_parents(parent1, pos1, parent2, pos2,
                                             n, current_end, start_city);
 
+            // meilleur candidat "autorisée"
             if (!forbidden && d < best_allowed_dist) {
                 best_allowed_dist = d;
                 best_allowed_frag = f;
                 best_allowed_orient = 0;
             }
+            // meilleur candidat global
             if (d < best_any_dist) {
                 best_any_dist = d;
                 best_any_frag = f;
@@ -514,7 +520,7 @@ static void dpx_find_best_fragment_to_connect(const int *parent1,
             }
         }
     }
-
+    // priorité à une connexion sans arête parentale, sinon on prend le meilleur global
     if (best_allowed_frag != -1) {
         *chosen_frag   = best_allowed_frag;
         *chosen_orient = best_allowed_orient;
@@ -524,7 +530,7 @@ static void dpx_find_best_fragment_to_connect(const int *parent1,
     }
 }
 
-// reconnecter les fragments (version factorisée)
+// reconnecter les fragments
 static void dpx_reconnect_fragments(const int *parent1, const int *parent2,
                                     int n,
                                     const DPXFragment *frags, int nb_frag,
@@ -536,9 +542,9 @@ static void dpx_reconnect_fragments(const int *parent1, const int *parent2,
         fprintf(stderr, "Malloc error in dpx_reconnect_fragments\n");
         exit(EXIT_FAILURE);
     }
-
+    // construit les tableaux pos1[pos], pos2[pos]
     dpx_build_pos_arrays(parent1, parent2, n, pos1, pos2);
-
+    // choisir le fragment de départ (en général le plus long)
     int start_frag = dpx_choose_start_fragment(frags, nb_frag);
 
     int child_pos = 0;
@@ -594,7 +600,9 @@ static void ga_dpx_crossover(
         exit(EXIT_FAILURE);
     }
 
+    // découpe parent1 en fragments cohérents avec parent2
     int nb_frag = dpx_build_fragments(parent1, parent2, n, frags);
+    // reconnecte les fragments pour former l'enfant
     dpx_reconnect_fragments(parent1, parent2, n, frags, nb_frag, child, graph);
 
     free(frags);
@@ -695,6 +703,9 @@ void run_genetic_algorithm(TSPGraph *graph, const char *instance_name, int pop_s
     ga_free_context(&ctx);
 }
 
+//DPX Preserve les sous chemin existant dans les 2 parents
+//reaccorde les fragmants en minimisant la distnace
+//evite la reutilisation des aretes deja presentes dans les parents si possible
 void run_genetic_algorithm_dpx(TSPGraph *graph, const char *instance_name, int pop_size, int generations, double mutation_rate) {
     if (!graph) {
         fprintf(stderr, "run_genetic_algorithm_dpx: graph is NULL\n");
@@ -728,3 +739,4 @@ void run_genetic_algorithm_dpx(TSPGraph *graph, const char *instance_name, int p
 
     ga_free_context(&ctx);
 }
+
