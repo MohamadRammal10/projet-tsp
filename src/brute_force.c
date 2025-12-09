@@ -38,28 +38,28 @@ static void sigint_handler(int s) {
  * @return 1 s'il existe une prochaine permutation, 0 sinon.
  */
 static int next_permutation(int *tour, int n) {
-    // Étape 1 : trouver le plus grand indice i tel que tour[i] < tour[i+1]
+    // trouver le plus grand indice i tel que tour[i] < tour[i+1]
     int i = n - 2;
     while (i >= 0 && tour[i] >= tour[i + 1]) {
         i--;
     }
-    // Si aucun tel indice n'existe, on a atteint la dernière permutation
+    // si n'existe, on a atteint la dernière permutation
     if (i < 0) {
         return 0;
     }
     
-    // Étape 2 : trouver le plus grand indice j tel que tour[i] < tour[j]
+    // trouver le plus grand indice j tel que tour[i] < tour[j]
     int j = n - 1;
     while (tour[i] >= tour[j]) {
         j--;
     }
     
-    // Étape 3 : échanger tour[i] et tour[j]
+    // échanger tour[i] et tour[j]
     int temp = tour[i];
     tour[i] = tour[j];
     tour[j] = temp;
     
-    // Étape 4 : inverser la sous-séquence de i+1 jusqu'à la fin
+    // inverser la sous-séquence de i+1 jusqu'à la fin
     int left = i + 1;
     int right = n - 1;
     while (left < right) {
@@ -82,10 +82,10 @@ static int next_permutation(int *tour, int n) {
  * @param graph Pointeur vers le graphe du TSP.
  * @param instance_name Nom de l'instance (pour affichage).
  */
-void simple_bruteforce_tsp(TSPGraph *graph, const char *instance_name) {
+void brute_force(TSPGraph *graph, const char *instance_name) {
     int n = graph->num_nodes;  // nombre total de villes
     
-    // Allocation des tableaux pour les tournées
+    // allocation des tableaux pour les tournées
     int *current_tour = (int*)malloc(n * sizeof(int));
     int *best_tour = (int*)malloc(n * sizeof(int));
     int *worst_tour = (int*)malloc(n * sizeof(int));
@@ -98,13 +98,12 @@ void simple_bruteforce_tsp(TSPGraph *graph, const char *instance_name) {
         return;
     }
     
-    // Initialisation : la tournée commence par [0, 1, 2, ..., n-1]
     for (int i = 0; i < n; i++) {
         current_tour[i] = i;
     }
     
-    double best_length = INFINITY;     // meilleure longueur trouvée (initialisée à l'infini)
-    double worst_length = -INFINITY;   // pire longueur trouvée (initialisée à -infini)
+    double best_length = INFINITY;     // meilleure longueur trouvée
+    double worst_length = -INFINITY;   // pire longueur trouvée
     unsigned long long iterations = 0; // compteur d'itérations
     
     clock_t start_time = clock();
@@ -145,17 +144,17 @@ void simple_bruteforce_tsp(TSPGraph *graph, const char *instance_name) {
             while (c == '\n') c = getchar();
             
             if (c == 'y' || c == 'Y') {
-                while (getchar() != '\n');  // vider le buffer
+                while (getchar() != '\n');  
                 printf("Sortie demandée.\n");
                 break;
             } else {
-                while (getchar() != '\n');  // vider le buffer
+                while (getchar() != '\n');  
                 signal(SIGINT, sigint_handler);
                 printf("Reprise du calcul...\n");
             }
         }
         
-    } while (next_permutation(current_tour, n));  // passer à la permutation suivante
+    } while (next_permutation(current_tour+1, n-1));  
     
     // Afficher les résultats finaux
     double total_time = (double)(clock() - start_time) / CLOCKS_PER_SEC;
@@ -185,5 +184,5 @@ void run_brute_force_graph(TSPGraph *graph, const char *instance_name) {
     if (graph->num_nodes <= 1) return;
 
     signal(SIGINT, sigint_handler);
-    simple_bruteforce_tsp(graph, instance_name);
+    brute_force(graph, instance_name);
 }
