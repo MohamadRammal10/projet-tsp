@@ -1,4 +1,4 @@
-# Traveling Salesman Problem (TSP)
+# 🇬🇧 Traveling Salesman Problem (TSP)
 
 [Project management](https://docs.google.com/spreadsheets/d/1D0tdRev2FNDUF0lIM8KSrpiOma9Gkf4VGkew63VwrPA/edit?gid=871870674#gid=871870674)
 
@@ -124,3 +124,127 @@ gadpx       Test genetic algorithm mode (DPX + 2-opt)
 Tests are validated if they get the same tour result compared to TSPLIB95 library.
 
 
+# 🇫🇷 Problème du Voyageur de Commerce (TSP)
+
+[Gestion de projet](https://docs.google.com/spreadsheets/d/1D0tdRev2FNDUF0lIM8KSrpiOma9Gkf4VGkew63VwrPA/edit?gid=871870674#gid=871870674)
+
+## Présentation de l’équipe
+
+Notre équipe de développement est composée de quatre membres :
+
+* **Mohamad RAMMAL** – RP
+* **Fourat AMMARI** – RSD
+* **Mohamed Yassine BOUZAIENE** – REH
+* **Oleksandra FILIUSHKINA** – RME
+
+---
+
+## Introduction
+
+Ce projet porte sur la résolution d’un problème d’optimisation, notamment le Problème du Voyageur de Commerce (TSP). Il vise à implémenter et comparer plusieurs algorithmes tout en analysant leurs performances. Le travail a été réalisé dans le cadre d’un projet académique, où l’équipe a collaboré pour concevoir, implémenter, tester et évaluer différentes méthodes de résolution. Le projet inclut des approches algorithmiques variées, des évaluations de performance, des outils de visualisation et un environnement structuré pour les tests.
+
+---
+
+## Description du problème
+
+Le problème principal étudié dans ce projet consiste à trouver un chemin efficace permettant de visiter toutes les villes d’un graphe donné. L’objectif est de comparer les performances de différentes stratégies.
+
+Les principaux défis incluent :
+
+* Comprendre et implémenter des algorithmes classiques (ex : brute force, plus proche voisin)
+* Intégrer des techniques de recherche probabilistes ou aléatoires (ex : random walk)
+* Implémenter des procédures d’optimisation (ex : heuristique d’amélioration 2‑opt)
+* Explorer des métaheuristiques avancées (ex : algorithme génétique)
+* Garantir une comparaison équitable via des tests et benchmarks cohérents
+* Construire une structure de projet claire et maintenable
+
+---
+
+### Modes / Méthodes disponibles
+
+Le projet prend en charge plusieurs modes algorithmiques :
+
+| Méthode      | Description                                                                  |
+| ------------ | ---------------------------------------------------------------------------- |
+| `bruteforce` | Explore exhaustivement toutes les solutions. Optimal mais très lent.         |
+| `nearest`    | Algorithme glouton choisissant à chaque étape le nœud le plus proche.        |
+| `randomwalk` | Génère des tournées aléatoires valides, utile pour des comparaisons simples. |
+| `twoopt`     | Applique une amélioration locale 2‑opt à une tournée existante.              |
+| `genetic`    | Utilise des stratégies évolutives : sélection, croisement, mutation.         |
+
+Exemple :
+
+```
+./tsp -f tests/example.tsp -c -m all
+```
+
+---
+
+## Utilisation
+
+![Image](https://github.com/h1tkx/projet-tsp/blob/main/structure.svg)
+
+### Exécution du programme principal
+
+-> Commandes Make :
+
+```
+make            Compile le projet
+make debug      Compile le projet en mode debug
+make clean      Supprime les fichiers .o
+```
+
+Pour exécuter le programme principal, utilisez :
+
+```
+./tsp -f <fichier> [-c] [-m <mode>]
+```
+
+-> Options :
+
+```
+-h           Affiche l’aide
+-f <file>    Fichier d’instance TSPLIB
+-c           Effectue une recherche canonique
+-m all       Exécute tous les algorithmes
+-m bf        Force brute
+-m nn        Plus proche voisin
+-m rw        Random walk
+-m 2optnn    2-opt sur nearest-neighbor
+-m 2optrw    2-opt sur random walk
+-m ga <pop_size> <num_generations> <mutation_rate>       Algorithme génétique
+-m gadpx <pop_size> <num_generations> <mutation_rate>    AG (DPX + 2-opt)
+```
+
+---
+
+### Options supplémentaires pour l’algorithme génétique
+
+* `pop_size` : Taille de la population (défaut : 100)
+* `num_generations` : Nombre de générations (défaut : 1000)
+* `mutation_rate` : Taux de mutation (défaut : 0.02)
+
+---
+
+## Exécution des tests
+
+Les tests se trouvent dans le dossier `tests/`. Pour les exécuter :
+
+```
+python3 test_tsp_c.py <mode>
+```
+
+Modes disponibles :
+
+```
+-c          Teste le mode canonique
+bf          Test brute force
+nn          Test plus proche voisin
+rw          Test random walk
+2optnn      Test 2-opt nearest-neighbor
+2optrw      Test 2-opt random walk
+ga          Test algorithme génétique
+gadpx       Test AG (DPX + 2-opt)
+```
+
+Les tests sont validés si la tournée obtenue correspond à celle générée par la bibliothèque TSPLIB95.
