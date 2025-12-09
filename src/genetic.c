@@ -77,6 +77,7 @@ static void ga_free_population(GAIndividual *pop, int pop_size) {
     for (int i = 0; i < pop_size; ++i) {
         free(pop[i].perm);
     }
+    free(pop);
 }
 
 //selection par tournoi
