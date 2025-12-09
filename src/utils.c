@@ -21,7 +21,7 @@ void usage(const char *p) {
     printf("  make clean        Clean .o files\n");
     printf("\n");
 
-    printf("Usage: %s -f <file> [-c] [-m <mode>] [-d]\n", p);
+    printf("Usage: %s -f <file> [-c] [-m <mode>]\n", p);
 
     printf("\n");
 
@@ -44,7 +44,6 @@ void usage(const char *p) {
     printf(" -> Testing config :\n");
     printf("   Usage: python3 test_tsp_c.py\n");
     printf("   -c          Test canonical mode\n");
-    printf("   all         Test all algorithms\n");    
     printf("   bf          Test brute force mode\n");
     printf("   nn          Test nearest neighbor mode\n");
     printf("   rw          Test random walk mode\n");

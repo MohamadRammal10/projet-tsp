@@ -1,93 +1,125 @@
-# Projet Avancé 2025 – Problème du Voyageur de Commerce (TSP)
+# Project Title
 
-## 📌 Présentation
-Ce projet a pour objectif d’implémenter différentes méthodes de résolution du **Problème du Voyageur de Commerce (TSP)** en langage **C**, en respectant les spécifications données (lecture de fichiers TSPLIB, comparaison d’algorithmes, normalisation des résultats).
+![Project Logo](path/to/logo.png)
 
-## 👥 Équipe 12
-- **Fourat Ammari** : Lecture TSPLIB, structures de données, matrice des distances  
-- **Oleksandra Filiushkina** : Brute Force, Nearest Neighbor  
-- **Mohamad Rammal** : Random Walk, 2-opt  
-- **Mohamed Yassine Bouzaiene** : Algorithme génétique, paramètres et tests  
+## Team Introduction
 
-## 🎯 Objectifs
-- Développer et comparer plusieurs algorithmes (Brute Force, Nearest Neighbor, Random Walk, 2-opt, Algorithme génétique).  
-- Respecter les contraintes de lecture de données (TSPLIB) et de normalisation des résultats.  
-- Produire un code documenté et testé, accompagné d’un rapport final.  
+Our development team consists of four members :
 
-## ⚙️ Compilation et exécution
-Un `Makefile` sera fourni pour compiler facilement le projet.
+* **Mohamad RAMMAL** – RP
+* **Fourat AMMARI** – RSD
+* **Mohamed Yassine BOUZAIENE** – REH
+* **Oleksandra FILIUSHKINA** – RME
 
-Exemple :
-```bash
-make
-./tsp -f instances/att10.tsp -m bf   # exécution brute force
-./tsp -f instances/att10.tsp -m nn   # exécution nearest neighbor
+---
+
+## Introduction
+
+This project focuses on solving an optimization problem such as the Traveling Salesman Problem, aiming to implement and compare various algorithms while analyzing their performance. The work was carried out as part of an academic development project, in which the team collaborated to design, implement, test, and evaluate different solution methods. The project includes multiple algorithmic approaches, performance evaluations, visualization tools, and a structured testing environment.
+
+---
+
+## Problem Description
+
+The core problem addressed in this project involves finding an efficient route in order to visit all cities on a given graph. The objective is to compare performance across multiple strategies.
+
+The main challenges include:
+
+* Understanding and implementing classical algorithms (e.g., brute force, nearest neighbor)
+* Integrating probabilistic or randomized search techniques (e.g., random walk)
+* Implementing optimization procedures (e.g., 2‑opt improvement heuristic)
+* Exploring advanced metaheuristics (e.g., genetic algorithms)
+* Ensuring fair comparison through consistent testing and benchmarking
+* Building a maintainable and clear project structure
+
+
+---
+
+
+### Available Modes / Methods
+
+The project supports several algorithmic modes:
+
+| Method       | Description                                                                   |
+| ------------ | ----------------------------------------------------------------------------- |
+| `bruteforce` | Exhaustively explores all possible solutions. Guarantees optimality but slow. |
+| `nearest`    | Greedy algorithm selecting the nearest available node at each step.           |
+| `randomwalk` | Generates random valid tours, useful for baseline comparisons.                |
+| `twoopt`     | Applies 2‑opt local improvement to an existing tour.                          |
+| `genetic`    | Uses evolutionary strategies: selection, crossover, mutation.                 |
+
+Example:
+
+```
+./tsp -f tests/example.tsp -c -m all
 ```
 
-## 🔀 Organisation Git & Workflow Collaboratif
+---
 
-### 1. Cloner le dépôt
-Chaque membre commence par cloner le dépôt :
-```bash
-git clone https://github.com/tonpseudo/projet-tsp.git
-cd projet-tsp
-```
 
-### 2. Créer une branche de travail
-Toujours travailler sur une branche personnelle/fonctionnelle :
-```bash
-git checkout main
-git pull origin main
-git checkout -b mohamad-rw   # exemple pour Random Walk
-```
+## Usage
 
-### 3. Committer son travail
-```bash
-git add fichier.c
-git commit -m "Implémentation initiale de Random Walk"
-```
+### Running the Main Program
 
-### 4. Pousser la branche sur GitHub
-```bash
-git push origin mohamad-rw
-```
+  -> Make options :
 
-### 5. Créer une Pull Request (PR)
-- Aller sur GitHub  
-- Cliquer sur **Compare & pull request**  
-- Vérifier que la PR va de **ta branche → main**  
-- Ajouter un commentaire descriptif  
-- Soumettre la PR pour validation  
+  make              Compile project
+  make debug        Compile project + debug mode
+  make clean        Clean .o files
+    
+  To execute the main program, use:
 
-### 6. Mettre à jour son dépôt
-Avant de commencer une nouvelle tâche :
-```bash
-git checkout main
-git pull origin main
-git checkout -b nouvelle-branche
-```
-
-### 7. Supprimer une branche (optionnel après merge)
-```bash
-git branch -d mohamad-rw
-git push origin --delete mohamad-rw
-```
-
-## ✅ Résumé des commandes utiles
-- **Mettre à jour `main`** :  
-  ```bash
-  git checkout main
-  git pull origin main
   ```
-- **Créer une branche** :  
-  ```bash
-  git checkout -b nom-de-branche
+  ./tsp -f <file> [-c] [-m <mode>]
   ```
-- **Commit & Push** :  
-  ```bash
-  git add .
-  git commit -m "Message"
-  git push origin nom-de-branche
+
+  -> Options :
+
+  ```
+  -h           Show this help message.
+  -f <file>    TSPLIB instance file
+  -c           Run canonical search
+  -m all       Run all algorithms
+  -m bf        Run brute-force search
+  -m nn        Run nearest-neighbor search
+  -m rw        Run random walk search
+  -m 2optnn    Run 2-opt nearest-neighbor search
+  -m 2optrw    Run 2-opt random walk search
+  -m ga <pop_size> <num_generations> <mutation_rate>       Test genetic algorithm mode
+  -m gadpx <pop_size> <num_generations> <mutation_rate>    Genetic algorithm (DPX + 2-opt)
   ```
 
 ---
+
+
+### Additional Options for the Genetic Algorithm
+
+* `pop_size` : Choose the size of the population. (default 100)
+* `num_generations` : Choose the number of generations. (default 1000)
+* `mutation_rate` : Set the mutation rate. (default 0.02)
+---
+
+## Running the Tests
+
+Tests are located in the `tests/` directory. Run them with:
+
+```
+python3 test_tsp_c.py <mode>
+```
+
+Mode options :
+
+```
+-c          Test canonical mode
+bf          Test brute force mode
+nn          Test nearest neighbor mode
+rw          Test random walk mode
+2optnn      Test 2-opt nearest-neighbor mode
+2optrw      Test 2-opt random walk mode
+ga          Test genetic algorithm mode
+gadpx       Test genetic algorithm mode (DPX + 2-opt)
+```
+
+Tests are validated if they get the same tour result compared to TSPLIB95 library.
+
+
