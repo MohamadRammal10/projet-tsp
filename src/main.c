@@ -20,6 +20,7 @@
 
 int main(int argc, char *argv[]) {
     const char *filename = NULL;
+
     int can = 0, bf = 0, nn = 0, rw = 0, ga = 0, gadpx = 0, twooptnn = 0, twooptrw = 0, all = 0;
     int pop_size = POP_SIZE;
     int num_generations = NUM_GENERATIONS;
@@ -38,8 +39,8 @@ int main(int argc, char *argv[]) {
         free_half_matrix(instance.half_matrix); 
         return EXIT_FAILURE; 
     }
+
     if (all) {
-        bf = 1;
         nn = 1;
         rw = 1;
         twooptnn = 1;

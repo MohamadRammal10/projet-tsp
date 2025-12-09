@@ -1,3 +1,7 @@
+./ali535.tsp
+./att532.tsp
+./bier127.tsp
+./brd14051.tsp
 ./att10.tsp
 ./geo.tsp
 ./example.tsp
