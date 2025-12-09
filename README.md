@@ -1,4 +1,6 @@
-# 🇬🇧 Traveling Salesman Problem (TSP)
+(english/french)
+
+# Traveling Salesman Problem (TSP)
 
 [Project management](https://docs.google.com/spreadsheets/d/1D0tdRev2FNDUF0lIM8KSrpiOma9Gkf4VGkew63VwrPA/edit?gid=871870674#gid=871870674)
 
@@ -124,7 +126,7 @@ gadpx       Test genetic algorithm mode (DPX + 2-opt)
 Tests are validated if they get the same tour result compared to TSPLIB95 library.
 
 
-# 🇫🇷 Problème du Voyageur de Commerce (TSP)
+# Problème du Voyageur de Commerce (TSP)
 
 [Gestion de projet](https://docs.google.com/spreadsheets/d/1D0tdRev2FNDUF0lIM8KSrpiOma9Gkf4VGkew63VwrPA/edit?gid=871870674#gid=871870674)
 
