@@ -57,6 +57,7 @@ Example:
 
 ## Usage
 
+![Image](https://github.com/h1tkx/projet-tsp/blob/main/structure.svg)
 ### Running the Main Program
 
   -> Make options :
